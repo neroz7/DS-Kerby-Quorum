@@ -23,21 +23,21 @@ public class StationEndpointManager {
 	/** Port implementation */
 	private StationPortImpl portImpl = new StationPortImpl(this);
 
-	// /** Obtain Port implementation */
-	// public StationPortType getPort() {
-	// return portImpl;
-	// }
+	/** Obtain Port implementation */
+	public StationPortType getPort() {
+		return portImpl;
+	}
 
 	/** Web Service end point */
 	private Endpoint endpoint = null;
 
-	// /** UDDI Naming instance for contacting UDDI server */
-	// private UDDINaming uddiNaming = null;
-	//
-	// /** Get UDDI Naming instance for contacting UDDI server */
-	// UDDINaming getUddiNaming() {
-	// return uddiNaming;
-	// }
+	/** UDDI Naming instance for contacting UDDI server */
+	/*private UDDINaming uddiNaming = null;
+	
+	/** Get UDDI Naming instance for contacting UDDI server */
+	/*UDDINaming getUddiNaming() {
+		return uddiNaming;
+	}*/
 
 	/** output option */
 	private boolean verbose = true;
