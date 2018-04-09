@@ -12,12 +12,12 @@ import org.binas.domain.BinasManager;
  * below "map" the Java class to the WSDL definitions.
  */
 // TODO
- @WebService(endpointInterface = "org.binas.station.ws.StationPortType",
+ @WebService(endpointInterface = "org.binas.ws.BinasPortType",
  wsdlLocation = "binas.1_0.wsdl",
- name ="StationWebService",
- portName = "StationPort",
- targetNamespace="http://ws.station.binas.org/",
- serviceName = "StationService"
+ name ="BinasWebService",
+ portName = "BinasPort",
+ targetNamespace="http://ws.binas.org/",
+ serviceName = "BinasService"
  )
 public class BinasPortImpl implements BinasPortType {
 
