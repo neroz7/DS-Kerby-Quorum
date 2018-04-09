@@ -1,4 +1,4 @@
-# Projeto de Sistemas Distribuídos 2017/18 #
+# Projeto de Sistemas DistribuÃ­dos 2017/18 #
 
 Grupo A09
 *(preencher com identificador de grupo e depois apagar esta linha)*
@@ -7,11 +7,11 @@ Pedro Mela ist178876 pedro.mela@ist.utl.pt
 
 Frederico Delaeare ist179674 frederico.delaeare@gmail.com
 
-... ... ...
+Mustafa Samir Khalil ist427068 mustafa.samir.khalil@tecnico.ulisboa.pt
 
-A questão da aula foi implementada.
+A questÃ£o da aula foi implementada.
 
-Instruções:
+InstruÃ§Ãµes:
 
 Correr server 
 
