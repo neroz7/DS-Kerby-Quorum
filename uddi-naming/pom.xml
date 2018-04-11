@@ -27,12 +27,12 @@
     </properties>
 
     <dependencies>
-        <!-- UDDI Naming -->
+        <!-- UDDI Naming
         <dependency>
             <groupId>pt.ulisboa.tecnico.sdis</groupId>
             <artifactId>uddi-naming</artifactId>
             <version>1.2</version>
-        </dependency>
+        </dependency> -->
         <!-- JAX-R API -->
         <dependency>
             <groupId>javax.xml.registry</groupId>

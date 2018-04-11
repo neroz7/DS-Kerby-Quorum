@@ -12,6 +12,7 @@ import org.binas.ws.UserView;
 public class BinasManager {
 
 	// Singleton -------------------------------------------------------------
+	private String id;
 	Map<String,User>users = new HashMap<String,User>();
 	
 	private BinasManager() {
@@ -29,25 +30,29 @@ public class BinasManager {
 		return SingletonHolder.INSTANCE;
 	}
 	
-	public UserView activateUser(String email) {
+	public User activateUser(String email) {
 		User user = new User();
 		user.setEmail(email);
-		user.setCredit(0);
+		user.setCredit(100);
 		user.setHasBina(false);
 		users.put(user.getEmail(),user);
-		return buildUserView(user);
+		return user;
 	}
 	
-	private UserView buildUserView(User user) {
-		UserView userView = new UserView();
-		userView.setCredit(user.getCredit());
-		userView.setEmail(user.getEmail());
-		userView.setHasBina(user.hasBina);
-		return userView;
-	}
 
 	public int getCredit(String email) throws UserNotExists_Exception {
 		return users.get(email).getCredit();
+	}
+
+	public void setId(String wsName) {
+		id = wsName;
+	}
+
+	public User getUser(String email) throws UserNotExists_Exception {
+		if(!users.containsKey(email)) {
+			throw new UserNotExists_Exception(email, null);
+		}
+		return users.get(email);
 	}
 	
 }

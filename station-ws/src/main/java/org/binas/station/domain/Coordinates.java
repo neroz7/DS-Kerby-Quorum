@@ -27,6 +27,10 @@ public class Coordinates {
 	public void setY(int y) {
 		this.y = y;
 	}
+	
+	public double distance(Coordinates c) {
+		return Math.sqrt( Math.pow( (c.getX()-getX()) , 2) + Math.pow( (c.getY()-getY()) , 2));	
+	}
 
 	@Override
 	public int hashCode() {

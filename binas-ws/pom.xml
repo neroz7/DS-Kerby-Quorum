@@ -25,7 +25,7 @@
 
 		<ws.name>${group.id}_Binas</ws.name>
 		<ws.url>http://localhost:8080/binas-ws/endpoint</ws.url>
-
+		
 		<station.ws.name>${group.id}_Station</station.ws.name>
 
 	</properties>

@@ -5,6 +5,7 @@ import java.io.IOException;
 import javax.xml.ws.Endpoint;
 
 import pt.ulisboa.tecnico.sdis.ws.uddi.UDDINaming;
+import pt.ulisboa.tecnico.sdis.ws.uddi.UDDINamingException;
 
 /** The endpoint manager starts and registers the service. */
 public class BinasEndpointManager {
@@ -26,7 +27,7 @@ public class BinasEndpointManager {
 	private BinasPortImpl portImpl = new BinasPortImpl(this);
 
 	/** Obtain Port implementation */
-	public BinasPortType getPort() {
+	public BinasPortImpl getPort() {
 		return portImpl;
 	}
 
@@ -57,6 +58,11 @@ public class BinasEndpointManager {
 		this.uddiURL = uddiURL;
 		this.wsName = wsName;
 		this.wsURL = wsURL;
+		try {
+			uddiNaming = new UDDINaming(uddiURL);
+		} catch (UDDINamingException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/** constructor with provided web service URL */
@@ -120,12 +126,18 @@ public class BinasEndpointManager {
 
 	/* UDDI */
 
-	void publishToUDDI() throws Exception {
-		// TODO
+	void publishToUDDI() throws UDDINamingException {
+		UDDINaming uddiNaming = new UDDINaming(uddiURL);
+		uddiNaming.rebind(wsName, wsURL);
+	}
+	
+	void lookUpForStations(String name) throws UDDINamingException {
+		uddiNaming.lookup(name);
 	}
 
-	void unpublishFromUDDI() {
-		// TODO
+	void unpublishFromUDDI() throws UDDINamingException {
+		UDDINaming uddiNaming = new UDDINaming(uddiURL);
+		uddiNaming.unbind(wsName);
 	}
 
 }
