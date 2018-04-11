@@ -1,9 +1,19 @@
 package org.binas.domain;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import org.binas.ws.StationView;
+import org.binas.ws.UserNotExists_Exception;
+import org.binas.ws.UserView;
+
 public class BinasManager {
 
 	// Singleton -------------------------------------------------------------
-
+	Map<String,User>users = new HashMap<String,User>();
+	
 	private BinasManager() {
 	}
 
@@ -19,55 +29,25 @@ public class BinasManager {
 		return SingletonHolder.INSTANCE;
 	}
 	
-	@Override
-	public UserView activateUser(String email) throws EmailExists_Exception,InvalidEmail_Exception {
-	
+	public UserView activateUser(String email) {
+		User user = new User();
+		user.setEmail(email);
+		user.setCredit(0);
+		user.setHasBina(false);
+		users.put(user.getEmail(),user);
+		return buildUserView(user);
 	}
 	
-	 @Override
-	 public StationView getInfoStation(String stationId) throws InvalidStation_Exception {
-
-	 }
-	
-	 @Override
-	 public List<StationView> listStations(Integer numberOfStations,CoordinatesView coordinates) {
-
-	 }
-	
-	 @Override
-	 public void rentBina(String stationId, String email) throws AlreadyHasBina_Exception, InvalidStation_Exception,NoBinaAvail_Exception, NoCredit_Exception, UserNotExists_Exception {
-
-	 }
-	
-	 @Override
-	 public void returnBina(String stationId, String email) throws FullStation_Exception, InvalidStation_Exception ,NoBinaRented_Exception, UserNotExists_Exception {
-	 
-	 }
-	
-	 @Override
-	 public int getCredit(String email) throws UserNotExists_Exception {
-
-	 }
-    //test control operations ------------------------------------------------
-
-	@Override
-	public String testPing(String inputMessage) {
-		
+	private UserView buildUserView(User user) {
+		UserView userView = new UserView();
+		userView.setCredit(user.getCredit());
+		userView.setEmail(user.getEmail());
+		userView.setHasBina(user.hasBina);
+		return userView;
 	}
-		
-	@Override
-	public void testClear() {
-		
-	}
-		
-	@Override
-	public void testInitStation(String stationId, int x, int y, int capacity, int returnPrize) throws BadInit_Exception {
-		
-	}
-		
-	@Override
-	public void testInit(int userInitialPoints) throws BadInit_Exception {
-		
+
+	public int getCredit(String email) throws UserNotExists_Exception {
+		return users.get(email).getCredit();
 	}
 	
 }
