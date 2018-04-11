@@ -1,35 +1,48 @@
 package org.binas.ws;
 
 import org.binas.domain.BinasManager;
+import org.binas.station.ws.cli.StationClient;
+import org.binas.station.ws.cli.StationClientApp;
 
 
 public class BinasApp {
 
 	public static void main(String[] args) throws Exception {
-		if (args.length < 2) {
-			System.err.println("Argument(s) missing!");
-			System.err.println("Usage: java " + BinasApp.class.getName() + "wsName wsURL OR wsName wsURL uddiURL");
-			return;
-		}
-		String wsName = args[0];
-		String wsURL = args[1];
-		
-		// TODO handle UDDI arguments
+		// Check arguments.
+				if (args.length == 0) {
+					System.err.println("Argument(s) missing!");
+					System.err.println("Usage: java " + StationClientApp.class.getName() + " wsURL OR uddiURL wsName");
+					return;
+				}
+				String uddiURL = null;
+				String wsName = null;
+				String wsURL = null;
+				if (args.length == 1) {
+					wsURL = args[0];
+				} else if (args.length >= 2) {
+					uddiURL = args[0];
+					wsName = args[1];
+				}
 
-		BinasEndpointManager endpoint = new BinasEndpointManager(wsName, wsURL);
-		//BinasManager.getInstance().setId(wsName);
+				System.out.println(StationClientApp.class.getSimpleName() + " running");
 
-		System.out.println(BinasApp.class.getSimpleName() + " running");
+				// Create client.
+				StationClient client = null;
 
-		// TODO start Web Service
-		try {
-			endpoint.start();
-			endpoint.awaitConnections();
-		} finally {
-			endpoint.stop();
-		}
-		System.out.println(BinasApp.class.getSimpleName() + " running");
-		// TODO
+				if (wsURL != null) {
+					System.out.printf("Creating client for server at %s%n", wsURL);
+					client = new StationClient(wsURL);
+				} else if (uddiURL != null) {
+					System.out.printf("Creating client using UDDI at %s for server with name %s%n", uddiURL, wsName);
+					client = new StationClient(uddiURL, wsName);
+				}
+
+				// The following remote invocation is just a basic example.
+				// The actual tests are made using JUnit.
+
+				System.out.println("Invoke ping()...");
+				String result = client.testPing("client");
+				System.out.print("Result: ");
+				System.out.println(result);
 	}
-
 }

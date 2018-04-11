@@ -1,6 +1,13 @@
 package org.binas.ws;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.jws.WebService;
 
@@ -28,6 +35,8 @@ public class BinasPortImpl implements BinasPortType {
 	private BinasEndpointManager endpointManager;
 	
 	private BinasManager binas;
+	Map<String,StationView>stations = new HashMap<String,StationView>();
+	
 	/** Constructor receives a reference to the endpoint manager. */
 	public BinasPortImpl(BinasEndpointManager endpointManager) {
 		this.endpointManager = endpointManager;
@@ -35,28 +44,42 @@ public class BinasPortImpl implements BinasPortType {
 	}
 	
 	public UserView activateUser(String email) {
-		UserView userView = new UserView();
-		userView.setEmail(email);
-		userView.setCredit(0);
-		return userView;
+		return binas.activateUser(email);
 	}
 
+	private double distance(CoordinatesView c1, CoordinatesView c2) {
+		return Math.sqrt( Math.pow( (c1.getX()-c2.getX()) , 2) + Math.pow( (c1.getY()-c2.getY()) , 2));	
+	}
+	
 	@Override
-	public List<StationView> listStations(Integer numberOfStations, CoordinatesView coordinates) {
-		// TODO Auto-generated method stub
-		return null;
+	public List<StationView> listStations(Integer numberOfStations, CoordinatesView coordinates){
+		List<StationView>stationsList = new ArrayList(stations.keySet());
+		Comparator<StationView> cmp = new Comparator<StationView>() {
+		    @Override
+		    public int compare(StationView st1, StationView st2) {
+		    	double dif = distance(coordinates, st1.getCoordinate()) - distance(coordinates, st2.getCoordinate());
+		        if(dif == 0){
+		            return 0;
+		        }
+		        return dif<0 ? -1 : 1;
+		     }
+		};
+		stationsList.sort(cmp);
+		List<StationView> res = new ArrayList<StationView>();
+		for(int i = 0; i < numberOfStations; i++) {
+			res.add(stationsList.get(i));
+		}
+		return res;
 	}
 
 	@Override
 	public StationView getInfoStation(String stationId) throws InvalidStation_Exception {
-		// TODO Auto-generated method stub
-		return null;
+		return stations.get(stationId);
 	}
 
 	@Override
 	public int getCredit(String email) throws UserNotExists_Exception {
-		// TODO Auto-generated method stub
-		return 0;
+		return binas.getCredit(email);
 	}
 
 	@Override

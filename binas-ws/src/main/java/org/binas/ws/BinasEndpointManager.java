@@ -4,6 +4,8 @@ import java.io.IOException;
 
 import javax.xml.ws.Endpoint;
 
+import pt.ulisboa.tecnico.sdis.ws.uddi.UDDINaming;
+
 /** The endpoint manager starts and registers the service. */
 public class BinasEndpointManager {
 
@@ -32,12 +34,12 @@ public class BinasEndpointManager {
 	private Endpoint endpoint = null;
 
 	/** UDDI Naming instance for contacting UDDI server */
-	/*private UDDINaming uddiNaming = null;
+	private UDDINaming uddiNaming = null;
 	
 	/** Get UDDI Naming instance for contacting UDDI server */
-	/*UDDINaming getUddiNaming() {
+	UDDINaming getUddiNaming() {
 		return uddiNaming;
-	}*/
+	}
 
 	/** output option */
 	private boolean verbose = true;
