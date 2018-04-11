@@ -1,5 +1,6 @@
 package org.binas.ws.cli;
 
+
 public class BinasClientApp {
 
     public static void main(String[] args) throws Exception {
@@ -21,7 +22,19 @@ public class BinasClientApp {
         }
 
 		System.out.println(BinasClientApp.class.getSimpleName() + " running");
+		
+		BinasClient client = null;
 
+		if (wsURL != null) {
+			System.out.printf("Creating client for server at %s%n", wsURL);
+			client = new BinasClient(wsURL);
+		} else if (uddiURL != null) {
+			System.out.printf("Creating client using UDDI at %s for server with name %s%n", uddiURL, wsName);
+			client = new BinasClient(uddiURL, wsName);
+		}
+		
+		String result = client.testPing("Hello there");
+		System.out.println(result);
         
         
 	 }
