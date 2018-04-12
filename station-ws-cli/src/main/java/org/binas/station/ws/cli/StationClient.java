@@ -11,6 +11,9 @@ import org.binas.station.ws.StationPortType;
 import org.binas.station.ws.StationService;
 import org.binas.station.ws.StationView;
 
+import pt.ulisboa.tecnico.sdis.ws.uddi.UDDINaming;
+import pt.ulisboa.tecnico.sdis.ws.uddi.UDDINamingException;
+
 /**
  * Client port wrapper.
  *
@@ -68,21 +71,31 @@ public class StationClient implements StationPortType {
 
 	/** UDDI lookup */
 	private void uddiLookup() throws StationClientException {
-		// TODO
+		UDDINaming uddiNaming = null;
+		try {
+			uddiNaming = new UDDINaming(uddiURL);
+		} catch (UDDINamingException e) {
+			e.printStackTrace();
+		}
+		try {
+			uddiNaming.lookup("A09_Station1");
+		} catch (UDDINamingException e) {
+			e.printStackTrace();
+		}
 	}
 
 
 	/** Stub creation and configuration */
 	private void createStub() {
 		if (verbose)
-		System.out.println("Creating stub ...");
-		// TODO
+			System.out.println("Creating stub ...");
+		
 		service = new StationService();
 		port = service.getStationPort();
 		
 		if (wsURL != null) {
-		if (verbose)
-			System.out.println("Setting endpoint address ...");
+			if (verbose)
+				System.out.println("Setting endpoint address ...");
 			BindingProvider bindingProvider = (BindingProvider) port;
 			Map<String, Object> requestContext = bindingProvider.getRequestContext();
 			requestContext.put(ENDPOINT_ADDRESS_PROPERTY, wsURL);
