@@ -30,6 +30,9 @@ public class BinasManager {
 		return SingletonHolder.INSTANCE;
 	}
 	
+	public synchronized void clearUsers() {
+		users.clear();
+	}
 	public User activateUser(String email) {
 		User user = new User();
 		user.setEmail(email);

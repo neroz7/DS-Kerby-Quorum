@@ -29,20 +29,29 @@ public class BinasApp {
 				BinasEndpointManager endpoint = new BinasEndpointManager(uddiURL, wsName, wsURL);
 				BinasManager.getInstance().setId(wsName);
 				
-				BinasPortImpl port = new BinasPortImpl(endpoint);
-				port.addStation("A09_Station1");
-				
-				port.activateUser("asda@gmail.com");
-				
-				port.rentBina("A09_Station1", "asda@gmail.com");
-				//System.out.println(BinasApp.class.getSimpleName() + " running");
-
 				try {
 					endpoint.start();
 					endpoint.awaitConnections();
+					
+					BinasPortImpl port = new BinasPortImpl(endpoint);
+					port.addStation("A09_Station1");
+					
+					port.activateUser("asda@gmail.com");
+					
+					port.rentBina("A09_Station1", "asda@gmail.com");
+					//System.out.println(BinasApp.class.getSimpleName() + " running");
+					
+					System.out.println("Invoke ping()...");
+					String result = port.testPing("client");
+					System.out.print("Result: ");
+					System.out.println(result);
+					
 				} finally {
 					endpoint.stop();
 				}
+				
+				
+				
 				
 				/*System.out.printf("Contacting UDDI at %s%n", uddiURL);
 				UDDINaming uddiNaming = new UDDINaming(uddiURL);

@@ -16,7 +16,9 @@ import org.binas.domain.User;
 import org.binas.station.ws.NoSlotAvail_Exception;
 import org.binas.station.ws.StationPortType;
 import org.binas.station.ws.StationService;
+import org.binas.station.ws.cli.StationClientException;
 
+import pt.ulisboa.tecnico.sdis.ws.uddi.UDDINaming;
 import pt.ulisboa.tecnico.sdis.ws.uddi.UDDINamingException;
 
 
@@ -44,6 +46,10 @@ public class BinasPortImpl implements BinasPortType {
 	
 	Map<String,StationView> stations = new HashMap<String,StationView>();
 	
+	StationService service = null;
+	
+	StationPortType port = null;
+	
 	/** Constructor receives a reference to the endpoint manager. */
 	public BinasPortImpl(BinasEndpointManager endpointManager) {
 		this.endpointManager = endpointManager;
@@ -51,6 +57,8 @@ public class BinasPortImpl implements BinasPortType {
 	}
 	
 	public void addStation(String stationId) throws UDDINamingException {
+		
+		System.out.printf("add Station with name %s",stationId);
 		String endpointAddress = endpointManager.getUddiNaming().lookup(stationId);
 
 		if (endpointAddress == null) {
@@ -92,6 +100,26 @@ public class BinasPortImpl implements BinasPortType {
 		userView.setEmail(user.getEmail());
 		userView.setHasBina(user.isHasBina());
 		return userView;
+	}
+	
+	private void lookUpAndCreatStup(String stationId) throws InvalidStation_Exception {
+		String endpointAddress = null;
+		try {
+			endpointAddress = endpointManager.getUddiNaming().lookup(stationId);
+		} catch (UDDINamingException e) {
+			e.printStackTrace();
+		}
+
+		if (endpointAddress == null) {
+			throw new InvalidStation_Exception(stationId, null);
+		}
+
+	    service = new StationService();
+		port = service.getStationPort();
+		
+		BindingProvider bindingProvider = (BindingProvider) port;
+		Map<String, Object> requestContext = bindingProvider.getRequestContext();
+		requestContext.put(ENDPOINT_ADDRESS_PROPERTY, endpointAddress);
 	}
 	
 	private double distance(CoordinatesView c1, CoordinatesView c2) {
@@ -140,23 +168,7 @@ public class BinasPortImpl implements BinasPortType {
 			throw new AlreadyHasBina_Exception(email, null);
 		}
 		
-		String endpointAddress = null;
-		try {
-			endpointAddress = endpointManager.getUddiNaming().lookup(stationId);
-		} catch (UDDINamingException e) {
-			e.printStackTrace();
-		}
-
-		if (endpointAddress == null) {
-			throw new InvalidStation_Exception(stationId, null);
-		}
-
-		StationService service = new StationService();
-		StationPortType port = service.getStationPort();
-		
-		BindingProvider bindingProvider = (BindingProvider) port;
-		Map<String, Object> requestContext = bindingProvider.getRequestContext();
-		requestContext.put(ENDPOINT_ADDRESS_PROPERTY, endpointAddress);
+		lookUpAndCreatStup(stationId);
 		
 		binas.getUser(email).setHasBina(true);
 		
@@ -167,7 +179,6 @@ public class BinasPortImpl implements BinasPortType {
 		try {
 			port.getBina();
 		}  catch (org.binas.station.ws.NoBinaAvail_Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -178,23 +189,7 @@ public class BinasPortImpl implements BinasPortType {
 		
 		User user = binas.getUser(email);
 		
-		String endpointAddress = null;
-		try {
-			endpointAddress = endpointManager.getUddiNaming().lookup(stationId);
-		} catch (UDDINamingException e) {
-			e.printStackTrace();
-		}
-
-		if (endpointAddress == null) {
-			throw new InvalidStation_Exception(stationId, null);
-		}
-
-		StationService service = new StationService();
-		StationPortType port = service.getStationPort();
-		
-		BindingProvider bindingProvider = (BindingProvider) port;
-		Map<String, Object> requestContext = bindingProvider.getRequestContext();
-		requestContext.put(ENDPOINT_ADDRESS_PROPERTY, endpointAddress);
+		lookUpAndCreatStup(stationId);
 		
 		if(port.getInfo().getAvailableBinas() == 0) {
 			throw new NoBinaRented_Exception(stationId, null);
@@ -210,21 +205,35 @@ public class BinasPortImpl implements BinasPortType {
 
 	@Override
 	public String testPing(String inputMessage) {
-		// TODO Auto-generated method stub
-		return null;
+		// If no input is received, return a default name.
+		if (inputMessage == null || inputMessage.trim().length() == 0)
+			inputMessage = "friend";
+				
+		// If the station does not have a name, return a default.
+		String wsName = endpointManager.getWsName();
+		if (wsName == null || wsName.trim().length() == 0)
+				wsName = "Station";
+			
+		// Build a string with a message to return.
+		StringBuilder builder = new StringBuilder();
+		builder.append("Hello ").append(inputMessage);
+		builder.append(" from ").append(wsName);
+		return builder.toString();
 	}
 
 	@Override
 	public void testClear() {
-		// TODO Auto-generated method stub
-		
+		BinasManager.getInstance().clearUsers();
 	}
 
 	@Override
 	public void testInitStation(String stationId, int x, int y, int capacity, int returnPrize)
 			throws BadInit_Exception {
-		// TODO Auto-generated method stub
-		
+		try {
+			port.testInit(x, y, capacity, returnPrize);
+		} catch (org.binas.station.ws.BadInit_Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
