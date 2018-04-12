@@ -89,7 +89,7 @@ public class BinasClient{ // implements BinasPortType {
 			e.printStackTrace();
 		}
 		try {
-			uddiNaming.lookup("A09_Binas");
+			wsURL = uddiNaming.lookup("A09_Binas");
 		} catch (UDDINamingException e) {
 			e.printStackTrace();
 		}
