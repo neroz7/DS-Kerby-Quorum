@@ -9,7 +9,6 @@ import org.binas.domain.exception.InvalidEmailException;
 import org.binas.domain.exception.UserNotExistsException;
 import org.binas.station.ws.cli.StationClient;
 import org.binas.station.ws.cli.StationClientException;
-import org.binas.ws.UserNotExists_Exception;
 import pt.ulisboa.tecnico.sdis.ws.uddi.UDDINaming;
 import pt.ulisboa.tecnico.sdis.ws.uddi.UDDINamingException;
 import pt.ulisboa.tecnico.sdis.ws.uddi.UDDIRecord;

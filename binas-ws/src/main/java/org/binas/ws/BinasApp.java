@@ -6,9 +6,6 @@ import javax.xml.ws.BindingProvider;
 import static javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY;
 
 import org.binas.domain.BinasManager;
-import org.binas.station.ws.StationPortType;
-import org.binas.station.ws.StationService;
-
 import pt.ulisboa.tecnico.sdis.ws.uddi.UDDINaming;
 
 
