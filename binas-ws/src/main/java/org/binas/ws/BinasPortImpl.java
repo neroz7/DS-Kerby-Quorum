@@ -50,6 +50,7 @@ public class BinasPortImpl implements BinasPortType {
 	private BinasManager binas;
 	
 	Map<String,StationClient>stationClients = new HashMap<String,StationClient>();
+	
 	/** Constructor receives a reference to the endpoint manager. */
 	public BinasPortImpl(BinasEndpointManager endpointManager) {
 		this.endpointManager = endpointManager;
