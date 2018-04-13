@@ -80,7 +80,7 @@ public class StationClient implements StationPortType {
 			e.printStackTrace();
 		}
 		try {
-			uddiNaming.lookup("A09_Station1");
+			uddiNaming.lookup(wsName);
 		} catch (UDDINamingException e) {
 			e.printStackTrace();
 		}
