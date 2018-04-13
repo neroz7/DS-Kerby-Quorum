@@ -1,6 +1,6 @@
 package org.binas.domain.exception;
 
-/** Exception used to signal that no slots are are currently available in a station. */
+/** The Email is checked and does not meet the conditions */
 public class InvalidEmailException extends Exception {
 	private static final long serialVersionUID = 1L;
 
