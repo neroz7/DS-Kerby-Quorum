@@ -94,7 +94,7 @@ public class BinasPortImpl implements BinasPortType {
 				System.out.println(stationClient.getInfo().getId());
 
 				
-				//System.out.println(stationClient.getWsURL());
+				System.out.println(stationClient.getWsURL());
 				stationClient.setVerbose(true);
 				stationClients.put(record.getOrgName(), stationClient);
 				
