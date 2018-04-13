@@ -14,6 +14,8 @@ import org.binas.station.ws.StationView;
 import pt.ulisboa.tecnico.sdis.ws.uddi.UDDINaming;
 import pt.ulisboa.tecnico.sdis.ws.uddi.UDDINamingException;
 
+import static javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY;
+
 /**
  * Client port wrapper.
  *
@@ -22,8 +24,6 @@ import pt.ulisboa.tecnico.sdis.ws.uddi.UDDINamingException;
  */
 // TODO implement Port Type interface
 public class StationClient implements StationPortType {
-
-	private static final String ENDPOINT_ADDRESS_PROPERTY = "what is this?";
 
 	/** WS service */
 	StationService service = null;
@@ -39,6 +39,8 @@ public class StationClient implements StationPortType {
 
 	/** WS end point address */
 	private String wsURL = null; // default value is defined inside WSDL
+	
+	private String endpointAddress = null;
 
 	public String getWsURL() {
 		return wsURL;
@@ -80,7 +82,7 @@ public class StationClient implements StationPortType {
 			e.printStackTrace();
 		}
 		try {
-			uddiNaming.lookup(wsName);
+			endpointAddress = uddiNaming.lookup(wsName);
 		} catch (UDDINamingException e) {
 			e.printStackTrace();
 		}

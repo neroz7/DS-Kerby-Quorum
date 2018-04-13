@@ -1,5 +1,10 @@
 package org.binas.station.ws.cli;
 
+import java.util.Collection;
+
+import pt.ulisboa.tecnico.sdis.ws.uddi.UDDINaming;
+import pt.ulisboa.tecnico.sdis.ws.uddi.UDDIRecord;
+
 /** Client application. */
 public class StationClientApp {
 
@@ -34,8 +39,14 @@ public class StationClientApp {
 			System.out.printf("Creating client using UDDI at %s for server with name %s%n", uddiURL, wsName);
 			client = new StationClient(uddiURL, wsName);
 		}
+		UDDINaming uddiNaming = new UDDINaming(uddiURL);
+		 
+        Collection<UDDIRecord> records = uddiNaming.listRecords("A09_Station%");
+        
+        for(UDDIRecord r:records) {
+        	System.out.println(r.getOrgName());
+        }
 		
-		System.out.println(wsName);
 		
 		System.out.println(client.getInfo().getId());
 
