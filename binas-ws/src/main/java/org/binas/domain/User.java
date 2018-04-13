@@ -19,7 +19,7 @@ public class User {
     	this.hasBina = false;
     }
 
-    private void checkemail(String email2) throws InvalidEmailException {
+    private void checkemail(String email) throws InvalidEmailException {
     	if(email==null || email.trim().equals("") || email.charAt(email.length()-1)=='.') {
 			throw new InvalidEmailException();
     	}

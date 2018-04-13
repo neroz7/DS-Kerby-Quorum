@@ -1,5 +1,7 @@
 package org.binas.ws.cli;
 
+import java.util.List;
+
 import org.binas.ws.CoordinatesView;
 import org.binas.ws.StationView;
 
@@ -43,6 +45,13 @@ public class BinasClientApp {
 		String result2  = client.getInfoStation("A09_Station1").getId();
 		System.out.print("Result: " + result2);
 		
+		CoordinatesView crd = new CoordinatesView();
+		crd.setX(1);
+		crd.setY(2);
+		List<StationView> stations = client.listStations(3, crd);
+		for(StationView st:stations) {
+			System.out.println(st.getId());
+		}
         
 	 }
 }

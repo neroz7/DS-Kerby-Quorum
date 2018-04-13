@@ -43,7 +43,7 @@ public class BinasManager {
 		}
 		User user = new User(email);
 		user.setEmail(email);
-		user.setCredit(100);
+		user.setCredit(0);
 		user.setHasBina(false);
 		users.put(user.getEmail(),user);
 		return user;
@@ -75,7 +75,7 @@ public class BinasManager {
     	
         UDDINaming uddiNaming = new UDDINaming("http://a09:dAgMX5F@uddi.sd.rnl.tecnico.ulisboa.pt:9090/");
 
-        Collection<UDDIRecord> records = uddiNaming.listRecords("A09_Station");
+        Collection<UDDIRecord> records = uddiNaming.listRecords("A09_Station%");
         StationClient stationClient = null;
         
         for(UDDIRecord record: records) {
