@@ -18,6 +18,7 @@ public class BinasManager {
 	// Singleton -------------------------------------------------------------
 	private String id;
 	Map<String,User>users = new HashMap<String,User>();
+	
 	private BinasManager() {
 	}
 
@@ -40,20 +41,17 @@ public class BinasManager {
 		if(users.containsKey(email)) {
 			throw new EmailExistsException();
 		}
-		User user = new User(email);
-		user.setEmail(email);
-		user.setCredit(0);
-		user.setHasBina(false);
+		User user = new User(email,0,false);
 		users.put(user.getEmail(),user);
 		return user;
 	}
 	
 
 	public int getCredit(String email) throws UserNotExistsException {
-		if(!users.containsKey(email)) {
-			throw new UserNotExistsException(email);
-		}
-		return users.get(email).getCredit();
+		//if(!users.containsKey(email)) {
+			//throw new UserNotExistsException(email);
+		//}
+		return getUser(email).getCredit();
 	}
 
 	public void setId(String wsName) {

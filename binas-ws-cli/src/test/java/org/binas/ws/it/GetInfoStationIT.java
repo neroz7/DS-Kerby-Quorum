@@ -39,15 +39,20 @@ public class GetInfoStationIT extends BaseIT{
 			Assert.assertEquals(0, client.getCredit("ist427068@tecnico.ulisboa.pt"));
 			client.testInit(10);
 			Assert.assertEquals(10, client.getCredit("alisyr1356h@gmail.com"));
-
+			
+			
+			
 			client.rentBina("A09_Station1", "alisyr1356h@gmail.com");
+			
+			Assert.assertEquals(11, client.getCredit("alisyr1356h@gmail.com"));
+			
 			client.rentBina("A09_Station1", "ist427068@tecnico.ulisboa.pt");
 			client.rentBina("A09_Station1", "pedromela@ist.utl.pt");
 			client.rentBina("A09_Station1", "fred@gmail.com");
 	
 			StationView stationView = client.getInfoStation("A09_Station1");
 			Assert.assertEquals(2, stationView.getAvailableBinas());
-
+			
 			client.returnBina("A09_Station1", "alisyr1356h@gmail.com");
 			client.returnBina("A09_Station1", "ist427068@tecnico.ulisboa.pt");
 			client.returnBina("A09_Station1", "pedromela@ist.utl.pt");
@@ -55,7 +60,7 @@ public class GetInfoStationIT extends BaseIT{
 	
 			stationView = client.getInfoStation("A09_Station1");
 
-			Assert.assertEquals(12, client.getCredit("alisyr1356h@gmail.com"));
+			Assert.assertEquals(13, client.getCredit("alisyr1356h@gmail.com"));
 			Assert.assertEquals(4, stationView.getTotalGets());
 			Assert.assertEquals(4, stationView.getTotalReturns());
 			Assert.assertEquals(6, stationView.getAvailableBinas());

@@ -18,6 +18,13 @@ public class User {
     	this.credit = 0;
     	this.hasBina = false;
     }
+    
+    public User(String email, Integer credit, Boolean hasBina) throws InvalidEmailException {
+    	checkemail(email);
+    	this.email = email;
+    	this.credit = credit;
+    	this.hasBina = hasBina;
+    }
 
     private void checkemail(String email) throws InvalidEmailException {
     	if(email==null || email.trim().equals("") || email.charAt(email.length()-1)=='.') {

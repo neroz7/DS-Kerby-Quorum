@@ -43,6 +43,7 @@ public class StationPortImpl implements StationPortType {
 	@Override
 	public StationView getInfo() {
 	// TODO
+		System.out.println("getInfo() invoked..");
 		return this.buildStationView(station);
 	}
 	
@@ -94,14 +95,18 @@ public class StationPortImpl implements StationPortType {
 	/** Return all station variables to default values. */
 	@Override
 	public void testClear() {
-		Station.getInstance().reset();
+		//Station.getInstance().reset();
+		station.reset();
+
 	}
 	
 	/** Set station variables with specific values. */
 	@Override
 	public void testInit(int x, int y, int capacity, int returnPrize) throws BadInit_Exception {
 		try {
-			Station.getInstance().init(x, y, capacity, returnPrize);
+			//Station.getInstance().init(x, y, capacity, returnPrize);
+			station.init(x, y, capacity, returnPrize);
+
 		} catch (BadInitException e) {
 			throwBadInit("Invalid initialization values!");
 		}

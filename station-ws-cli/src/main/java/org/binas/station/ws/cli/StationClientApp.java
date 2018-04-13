@@ -44,12 +44,17 @@ public class StationClientApp {
         Collection<UDDIRecord> records = uddiNaming.listRecords("A09_Station%");
         
         for(UDDIRecord r:records) {
-        	System.out.println(r.getOrgName());
+        	//System.out.println(r.getOrgName());
+        	client = new StationClient(r.getUrl());
+
+    		System.out.println(client.getInfo().getId());
         }
 		
-		
-		System.out.println(client.getInfo().getId());
+    	//client = new StationClient(wsURL);
 
+		//System.out.println(client.getInfo().getId());
+
+		
 		// The following remote invocation is just a basic example.
 		// The actual tests are made using JUnit.
 

@@ -72,7 +72,7 @@ public class StationEndpointManager {
 			// publish end point
 			endpoint = Endpoint.create(this.portImpl);
 			if (verbose) {
-				System.out.printf("Starting %s%n", wsURL);
+				System.out.printf("Starting %s at %s%n", wsName, wsURL);
 			}
 			endpoint.publish(wsURL);
 		} catch (Exception e) {
