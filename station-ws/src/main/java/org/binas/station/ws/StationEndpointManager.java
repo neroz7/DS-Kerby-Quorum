@@ -87,10 +87,10 @@ public class StationEndpointManager {
 	}
 
 	public void awaitConnections() {
-		if (verbose) {
+		//if (verbose) {
 			System.out.println("Awaiting connections");
 			System.out.println("Press enter to shutdown");
-		}
+		//}
 		try {
 			System.in.read();
 		} catch (IOException e) {
@@ -120,13 +120,17 @@ public class StationEndpointManager {
 
 	/* UDDI */
 
-	void publishToUDDI() throws Exception {
-		uddiNaming = new UDDINaming(uddiURL);
-		uddiNaming.bind(wsName, wsURL);
+	void publishToUDDI() throws UDDINamingException {
+		if(uddiURL != null) {
+			System.out.println(uddiURL);
+			uddiNaming = new UDDINaming(uddiURL);
+			uddiNaming.bind(wsName, wsURL);
+		}
 	}
 
 	void unpublishFromUDDI() throws UDDINamingException {
-		uddiNaming.unbind(wsName);
+		if(uddiURL != null)
+			uddiNaming.unbind(wsName);
 	}
 
 }
