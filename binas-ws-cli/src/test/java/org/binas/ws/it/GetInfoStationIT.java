@@ -1,7 +1,12 @@
 package org.binas.ws.it;
 
+import java.util.List;
+
+import org.binas.domain.exception.InvalidStationException;
+import org.binas.domain.exception.UserNotExistsException;
 import org.binas.ws.AlreadyHasBina_Exception;
 import org.binas.ws.BadInit_Exception;
+import org.binas.ws.CoordinatesView;
 import org.binas.ws.EmailExists_Exception;
 import org.binas.ws.FullStation_Exception;
 import org.binas.ws.InvalidEmail_Exception;
@@ -72,8 +77,15 @@ public class GetInfoStationIT extends BaseIT{
 				e.printStackTrace();
 			} catch (NoBinaRented_Exception e) {
 				e.printStackTrace();
-			}finally {
-			
 			}
     }
+	@Test(expected=InvalidStationException.class)
+    public void notExistingStation() throws AlreadyHasBina_Exception, InvalidStation_Exception, NoBinaAvail_Exception, NoCredit_Exception, UserNotExists_Exception {
+		client.rentBina("A09_Station4", "alisyr1356h@gmail.com");
+	}
+	@Test(expected=UserNotExistsException.class)
+    public void notExistingUser() throws AlreadyHasBina_Exception, InvalidStation_Exception, NoBinaAvail_Exception, NoCredit_Exception, UserNotExists_Exception {
+		client.rentBina("A09_Station1", "alisyr1356h@gmail.com");
+	}
+	
 }
