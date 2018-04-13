@@ -9,7 +9,7 @@ import org.junit.Test;
 
 public class ActivateUserIT extends BaseIT{
 	
-	private static final String EMAIL = "sss@tecnico.ulisboa.pt";
+	private static final String EMAIL = "sss@tecnico.pt";
 	
 	@Before
 	public void setUp() throws BadInit_Exception, EmailExists_Exception, InvalidEmail_Exception {
