@@ -33,10 +33,10 @@ import pt.ulisboa.tecnico.sdis.ws.uddi.UDDINamingException;
 public class BinasClient{ // implements BinasPortType {
 	private static final String ENDPOINT_ADDRESS_PROPERTY = "what is this?";
     /** WS service */
-	// BinasService service = null;
+	 BinasService service = null;
 
     /** WS port (port type is the interface, port is the implementation) */
-	// BinasPortType port = null;
+	 BinasPortType port = null;
 
     /** UDDI server URL */
     private String uddiURL = null;
@@ -46,10 +46,6 @@ public class BinasClient{ // implements BinasPortType {
 
     /** WS endpoint address */
     private String wsURL = null; // default value is defined inside WSDL
-    
-    BinasService service = null;
-    
-    BinasPortType port = null;
 
     public String getWsURL() {
         return wsURL;
@@ -76,6 +72,7 @@ public class BinasClient{ // implements BinasPortType {
     public BinasClient(String uddiURL, String wsName) throws BinasClientException {
         this.uddiURL = uddiURL;
         this.wsName = wsName;
+        setVerbose(true);
         uddiLookup();
         createStub();
     }

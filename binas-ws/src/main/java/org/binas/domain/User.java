@@ -9,8 +9,8 @@ import org.binas.domain.exception.NoCreditException;
 public class User {
 	protected String email;
 	private String password;
-    protected Boolean hasBina;
-    protected Integer credit;
+    private Boolean hasBina;
+    private Integer credit;
     
     public User(String email) throws InvalidEmailException {
     	checkemail(email);

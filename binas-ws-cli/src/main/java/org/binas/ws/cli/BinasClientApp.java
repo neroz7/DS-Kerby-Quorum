@@ -1,5 +1,7 @@
 package org.binas.ws.cli;
 
+import org.binas.ws.CoordinatesView;
+import org.binas.ws.StationView;
 
 public class BinasClientApp {
 
@@ -33,9 +35,14 @@ public class BinasClientApp {
 			client = new BinasClient(uddiURL, wsName);
 		}
 		
+		System.out.println("Invoke ping()...");
 		String result = client.testPing("Hello there");
 		System.out.println(result);
         
+		System.out.println("Invoke stationInfo()...");
+		String result2  = client.getInfoStation("A09_Station1").getId();
+		System.out.print("Result: " + result2);
+		
         
 	 }
 }
