@@ -1,6 +1,6 @@
 package org.binas.domain.exception;
 
-/** Exception used to signal that no Binas are currently available in a station. */
+/** Exception used to signal that the initialization is bad. */
 public class BadInitException extends Exception {
 	private static final long serialVersionUID = 1L;
 
