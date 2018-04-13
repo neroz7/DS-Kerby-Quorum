@@ -18,7 +18,6 @@ public class BinasManager {
 	// Singleton -------------------------------------------------------------
 	private String id;
 	Map<String,User>users = new HashMap<String,User>();
-	Map<String,StationClient>stationClients = new HashMap<String,StationClient>();
 	private BinasManager() {
 	}
 
@@ -68,29 +67,6 @@ public class BinasManager {
 		return users.get(email);
 	}
 	
-	public synchronized Map<String, StationClient> getStationClients() throws UDDINamingException{
-    	if(!stationClients.isEmpty()){
-    		stationClients.clear();
-        }
-    	
-        UDDINaming uddiNaming = new UDDINaming("http://a09:dAgMX5F@uddi.sd.rnl.tecnico.ulisboa.pt:9090/");
-
-        Collection<UDDIRecord> records = uddiNaming.listRecords("A09_Station%");
-        StationClient stationClient = null;
-        
-        for(UDDIRecord record: records) {
-    		try {
-				stationClient = new StationClient(record.getUrl());
-				stationClient.setVerbose(true);
-				stationClients.put(record.getOrgName(), stationClient);
-			} 
-    		catch (StationClientException e) {
-				new StationClientException("Binas has no client in the url" + record.getUrl());
-    		}
-        }
-        
-        return stationClients;
-    }
 
 	public Map<String, User> getUsers() {
 		return users;

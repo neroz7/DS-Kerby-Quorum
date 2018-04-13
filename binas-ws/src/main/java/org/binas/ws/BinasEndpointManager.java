@@ -1,11 +1,13 @@
 package org.binas.ws;
 
 import java.io.IOException;
+import java.util.Collection;
 
 import javax.xml.ws.Endpoint;
 
 import pt.ulisboa.tecnico.sdis.ws.uddi.UDDINaming;
 import pt.ulisboa.tecnico.sdis.ws.uddi.UDDINamingException;
+import pt.ulisboa.tecnico.sdis.ws.uddi.UDDIRecord;
 
 /** The endpoint manager starts and registers the service. */
 public class BinasEndpointManager {
@@ -138,6 +140,11 @@ public class BinasEndpointManager {
 	void unpublishFromUDDI() throws UDDINamingException {
 		UDDINaming uddiNaming = new UDDINaming(uddiURL);
 		uddiNaming.unbind(wsName);
+	}
+
+	public Collection<UDDIRecord> getListOfRecords() throws UDDINamingException {
+		uddiNaming = new UDDINaming("http://a09:dAgMX5F@uddi.sd.rnl.tecnico.ulisboa.pt:9090/");
+		return uddiNaming.listRecords("A09_Station%");
 	}
 
 }

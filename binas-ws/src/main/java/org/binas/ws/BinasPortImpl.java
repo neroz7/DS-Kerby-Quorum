@@ -1,25 +1,30 @@
 package org.binas.ws;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import javax.jws.WebService;
 import org.binas.domain.BinasManager;
 import org.binas.domain.User;
 import org.binas.domain.exception.AlreadyHasBinaException;
 import org.binas.domain.exception.BadInitException;
 import org.binas.domain.exception.EmailExistsException;
-import org.binas.domain.exception.FullStationException;
 import org.binas.domain.exception.InvalidEmailException;
 import org.binas.domain.exception.InvalidStationException;
-import org.binas.domain.exception.NoBinaAvailException;
 import org.binas.domain.exception.NoBinaRentedException;
 import org.binas.domain.exception.NoCreditException;
 import org.binas.domain.exception.UserNotExistsException;
 import org.binas.station.ws.NoSlotAvail_Exception;
 import org.binas.station.ws.cli.StationClient;
+import org.binas.station.ws.cli.StationClientException;
+
 import pt.ulisboa.tecnico.sdis.ws.uddi.UDDINaming;
 import pt.ulisboa.tecnico.sdis.ws.uddi.UDDINamingException;
+import pt.ulisboa.tecnico.sdis.ws.uddi.UDDIRecord;
 
 
 /**
@@ -44,6 +49,7 @@ public class BinasPortImpl implements BinasPortType {
 	
 	private BinasManager binas;
 	
+	Map<String,StationClient>stationClients = new HashMap<String,StationClient>();
 	/** Constructor receives a reference to the endpoint manager. */
 	public BinasPortImpl(BinasEndpointManager endpointManager) {
 		this.endpointManager = endpointManager;
@@ -66,13 +72,38 @@ public class BinasPortImpl implements BinasPortType {
 		return Math.sqrt( Math.pow( (c1.getX()-c2.getX()) , 2) + Math.pow( (c1.getY()-c2.getY()) , 2));	
 	}
 	
+	public synchronized Map<String, StationClient> getStationClients() throws UDDINamingException{
+    	if(!stationClients.isEmpty()){
+    		stationClients.clear();
+        }
+    	
+    	UDDINaming uddiNaming = new UDDINaming("http://a09:dAgMX5F@uddi.sd.rnl.tecnico.ulisboa.pt:9090/");
+		 
+        Collection<UDDIRecord> records = uddiNaming.listRecords("A09_Station%");
+ 
+        StationClient stationClient = null;
+        
+        for(UDDIRecord record: records) {
+    		try {
+				stationClient = new StationClient(record.getUrl());
+				stationClient.setVerbose(true);
+				stationClients.put(record.getOrgName(), stationClient);
+			} 
+    		catch (StationClientException e) {
+				new StationClientException("Binas has no client in the url" + record.getUrl());
+    		}
+        }
+        
+        return stationClients;
+    }
+	
 	@Override
 	public List<StationView> listStations(Integer numberOfStations, CoordinatesView coordinates){
 		
 		List<StationView>stationsList = new ArrayList<StationView>();
 		
 		try {
-			for(StationClient st:BinasManager.getInstance().getStationClients().values()) {
+			for(StationClient st:getStationClients().values()) {
 				stationsList.add(buildStationView(st.getInfo()));
 			}
 		} catch (UDDINamingException e) {
@@ -104,10 +135,10 @@ public class BinasPortImpl implements BinasPortType {
 	@Override
 	public StationView getInfoStation(String stationId) throws InvalidStation_Exception {
 		try {
-			if(!BinasManager.getInstance().getStationClients().containsKey(stationId)) {
+			if(!getStationClients().containsKey(stationId)) {
 				throw new InvalidStationException();
 			}
-			return buildStationView(BinasManager.getInstance().getStationClients().get(stationId).getInfo());
+			return buildStationView(getStationClients().get(stationId).getInfo());
 		} catch(InvalidStationException e) {
 			throwInvalidStationException("Can not find Station with Id: " + stationId);
 			return null;
@@ -131,11 +162,11 @@ public class BinasPortImpl implements BinasPortType {
 	@Override
 	public void rentBina(String stationId, String email) throws AlreadyHasBina_Exception, InvalidStation_Exception, NoBinaAvail_Exception, NoCredit_Exception, UserNotExists_Exception {
 		try {
-			if(!binas.getStationClients().containsKey(stationId)) {
+			if(!getStationClients().containsKey(stationId)) {
 				throw new InvalidStationException();
 			}
 			User user = binas.getUser(email);
-			binas.getStationClients().get(stationId).getBina();
+			getStationClients().get(stationId).getBina();
 			user.getBina();
 			binas.getUser(email).setHasBina(true);
 		}catch(InvalidStationException e){
@@ -159,10 +190,10 @@ public class BinasPortImpl implements BinasPortType {
 	public void returnBina(String stationId, String email)
 			throws FullStation_Exception, InvalidStation_Exception, NoBinaRented_Exception, UserNotExists_Exception {
 		try {
-			if(!binas.getStationClients().containsKey(stationId)) {
+			if(!getStationClients().containsKey(stationId)) {
 				throw new InvalidStationException();
 			}
-			StationClient client = binas.getInstance().getStationClients().get(stationId);
+			StationClient client = getStationClients().get(stationId);
 			try {
 				client.returnBina();
 			} catch (NoSlotAvail_Exception e) {
@@ -209,7 +240,7 @@ public class BinasPortImpl implements BinasPortType {
 	@Override
 	public void testClear() {
 		try {
-			for(StationClient client:binas.getInstance().getStationClients().values()) {
+			for(StationClient client: getStationClients().values()) {
 				client.testClear();
 			}
 		} catch (UDDINamingException e) {
@@ -223,7 +254,7 @@ public class BinasPortImpl implements BinasPortType {
 			throws BadInit_Exception {
 		StationClient client;
 		try {
-			client = binas.getStationClients().get(stationId);
+			client = getStationClients().get(stationId);
 			client.testInit(x, y, capacity, returnPrize);
 		} catch (UDDINamingException e) {
 			// TODO Auto-generated catch block
@@ -237,7 +268,7 @@ public class BinasPortImpl implements BinasPortType {
 
 	@Override
 	public void testInit(int userInitialPoints) throws BadInit_Exception {
-		for(User user: binas.getInstance().getUsers().values())
+		for(User user: binas.getUsers().values())
 			try {
 				user.testInit(userInitialPoints);
 			} catch (BadInitException e) {
@@ -245,17 +276,19 @@ public class BinasPortImpl implements BinasPortType {
 			}
 		
 	}
-
-	private StationView buildStationView(org.binas.station.ws.StationView view) {
-		StationView actualView = new StationView();
-		actualView.setAvailableBinas(view.getAvailableBinas());
-		actualView.setCapacity(view.getCapacity());
-		actualView.setCoordinate(buildCoordinatesView(view.getCoordinate()));
-		actualView.setFreeDocks(view.getFreeDocks());
-		actualView.setId(view.getId());
-		actualView.setTotalGets(view.getTotalGets());
-		actualView.setTotalReturns(view.getTotalReturns());
-		return actualView;
+	
+	//Views Builders
+	
+	private StationView buildStationView(org.binas.station.ws.StationView oldStation) {
+		StationView station = new StationView();
+		station.setAvailableBinas(oldStation.getAvailableBinas());
+		station.setCapacity(oldStation.getCapacity());
+		station.setCoordinate(buildCoordinatesView(oldStation.getCoordinate()));
+		station.setFreeDocks(oldStation.getFreeDocks());
+		station.setId(oldStation.getId());
+		station.setTotalGets(oldStation.getTotalGets());
+		station.setTotalReturns(oldStation.getTotalReturns());
+		return station;
 	}
 
 	private CoordinatesView buildCoordinatesView(org.binas.station.ws.CoordinatesView view) {
@@ -275,6 +308,7 @@ public class BinasPortImpl implements BinasPortType {
 		return userView;
 	}
 	
+	//Exceptions throwers
 	private void throwInvalidEmailException(final String message) throws InvalidEmail_Exception {
 		InvalidEmail faultInfo = new InvalidEmail();
 		faultInfo.message = message;
@@ -315,12 +349,6 @@ public class BinasPortImpl implements BinasPortType {
 		InvalidStation faultInfo = new InvalidStation();
 		faultInfo.message = message;
 		throw new InvalidStation_Exception(message, faultInfo);
-	}
-	
-	private void throwFullStationException(final String message) throws FullStation_Exception {
-		FullStation faultInfo = new FullStation();
-		faultInfo.message = message;
-		throw new FullStation_Exception(message, faultInfo);
 	}
 	
 	private void throwNoBinaRentedException(final String message) throws NoBinaRented_Exception {
