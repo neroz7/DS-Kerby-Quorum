@@ -58,6 +58,7 @@ public class StationClient implements StationPortType {
 	/** constructor with provided web service URL */
 	public StationClient(String wsURL) throws StationClientException {
 		this.wsURL = wsURL;
+		setVerbose(true);
 		createStub();
 	}
 
@@ -65,6 +66,7 @@ public class StationClient implements StationPortType {
 	public StationClient(String uddiURL, String wsName) throws StationClientException {
 		this.uddiURL = uddiURL;
 		this.wsName = wsName;
+		setVerbose(true);
 		uddiLookup();
 		createStub();
 	}
@@ -106,17 +108,17 @@ public class StationClient implements StationPortType {
 
 	@Override
 	public StationView getInfo() {
-	return port.getInfo();
+		return port.getInfo();
 	}
 	
 	@Override
 	public void getBina() throws NoBinaAvail_Exception {
-	port.getBina();
+		port.getBina();
 	}
 	
 	@Override
 	public int returnBina() throws NoSlotAvail_Exception {
-	return port.returnBina();
+		return port.returnBina();
 	}
 
 	// test control operations ------------------------------------------------
