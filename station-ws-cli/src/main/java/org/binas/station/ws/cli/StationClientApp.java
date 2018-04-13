@@ -27,17 +27,15 @@ public class StationClientApp {
 		// Create client.
 		StationClient client = null;
 
-		//if (wsURL != null) {
-		//	System.out.printf("Creating client for server at %s%n", wsURL);
-	    //	client = new StationClient(wsURL);
-		//} else if (uddiURL != null) {
-		//	System.out.printf("Creating client using UDDI at %s for server with name %s%n", uddiURL, wsName);
-		//	client = new StationClient(uddiURL, wsName);
-		//}
+		if (wsURL != null) {
+			System.out.printf("Creating client for server at %s%n", wsURL);
+	    	client = new StationClient(wsURL);
+		} else if (uddiURL != null) {
+			System.out.printf("Creating client using UDDI at %s for server with name %s%n", uddiURL, wsName);
+			client = new StationClient(uddiURL, wsName);
+		}
 		
 		System.out.println(wsName);
-		
-		client = new StationClient(uddiURL, wsName);
 		
 		System.out.println(client.getInfo().getId());
 
