@@ -30,51 +30,13 @@ public class BinasApp {
 				BinasManager.getInstance().setId(wsName);
 				
 				try {
+					
 					endpoint.start();
 					endpoint.awaitConnections();
-					
-					BinasPortImpl port = new BinasPortImpl(endpoint);
-					port.addStation("A09_Station1");
-					
-					port.activateUser("asda@gmail.com");
-					
-					port.rentBina("A09_Station1", "asda@gmail.com");
-					//System.out.println(BinasApp.class.getSimpleName() + " running");
-					
-					System.out.println("Invoke ping()...");
-					String result = port.testPing("client");
-					System.out.print("Result: ");
-					System.out.println(result);
-					
+								
 				} finally {
 					endpoint.stop();
 				}
-				
-				
-				
-				
-				/*System.out.printf("Contacting UDDI at %s%n", uddiURL);
-				UDDINaming uddiNaming = new UDDINaming(uddiURL);
-
-				System.out.printf("Looking for '%s'%n", name);
-				String endpointAddress = uddiNaming.lookup(name);
-
-				if (endpointAddress == null) {
-					System.out.println("Not found!");
-					return;
-				} else {
-					System.out.printf("Found %s%n", endpointAddress);
-				}
-
-				System.out.println("Creating stub ...");
-				StationService service = new StationService();
-				StationPortType port = service.getStationPort();
-				
-				System.out.println("Setting endpoint address ...");
-				BindingProvider bindingProvider = (BindingProvider) port;
-				Map<String, Object> requestContext = bindingProvider.getRequestContext();
-				requestContext.put(ENDPOINT_ADDRESS_PROPERTY, endpointAddress);*/
-				
 				
 	}
 }
