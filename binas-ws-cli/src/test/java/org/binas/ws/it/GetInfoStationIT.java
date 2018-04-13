@@ -25,7 +25,7 @@ public class GetInfoStationIT extends BaseIT{
 		EmailExists_Exception, InvalidEmail_Exception {
 		
 		client.testClear();
-		client.testInitStation("A09_Station1", 20, 30, 30, 30);
+		client.testInitStation("A09_Station1", 22, 7, 6, 2);
 		client.activateUser("ist427068@tecnico.ulisboa.pt");
 		client.activateUser("alisyr1356h@gmail.com");
 		client.activateUser("pedromela@ist.utl.pt");
@@ -46,7 +46,7 @@ public class GetInfoStationIT extends BaseIT{
 			client.rentBina("A09_Station1", "fred@gmail.com");
 	
 			StationView stationView = client.getInfoStation("A09_Station1");
-			Assert.assertEquals(26, stationView.getAvailableBinas());
+			Assert.assertEquals(2, stationView.getAvailableBinas());
 
 			client.returnBina("A09_Station1", "alisyr1356h@gmail.com");
 			client.returnBina("A09_Station1", "ist427068@tecnico.ulisboa.pt");
@@ -55,10 +55,10 @@ public class GetInfoStationIT extends BaseIT{
 	
 			stationView = client.getInfoStation("A09_Station1");
 
-			Assert.assertEquals(50, client.getCredit("alisyr1356h@gmail.com"));
+			Assert.assertEquals(12, client.getCredit("alisyr1356h@gmail.com"));
 			Assert.assertEquals(4, stationView.getTotalGets());
 			Assert.assertEquals(4, stationView.getTotalReturns());
-			Assert.assertEquals(30, stationView.getAvailableBinas());
+			Assert.assertEquals(6, stationView.getAvailableBinas());
 			} catch (UserNotExists_Exception e) {
 				e.printStackTrace();
 			} catch (BadInit_Exception e) {

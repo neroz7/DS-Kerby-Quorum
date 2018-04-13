@@ -19,9 +19,9 @@ public class ListStationsIT extends BaseIT{
 	public static void setUp() {
 		try {
 			client.testClear();
-			client.testInitStation("A09_Station1", 4, 5, 30, 30);
-			client.testInitStation("A09_Station2", 10, 11, 30, 30);
-			client.testInitStation("A09_Station3", 23, 28, 30, 30);
+			client.testInitStation("A09_Station1", 22, 7, 6, 2);
+			client.testInitStation("A09_Station2", 80, 20, 12, 1);
+			client.testInitStation("A09_Station3", 50, 50, 20, 0);
 			client.activateUser("alisyr1356h@gmail.com");
 		} catch (BadInit_Exception | EmailExists_Exception | InvalidEmail_Exception e) {
 			// TODO Auto-generated catch block
@@ -32,12 +32,12 @@ public class ListStationsIT extends BaseIT{
 	@Test
     public void rightOrder() {
 		CoordinatesView crd = new CoordinatesView();
-		crd.setX(1);
-		crd.setY(2);
+		crd.setX(0);
+		crd.setY(0);
 		List<StationView> stations = client.listStations(3, crd);
 		Assert.assertEquals("A09_Station1", stations.get(0).getId());
-		Assert.assertEquals("A09_Station2", stations.get(1).getId());
-		Assert.assertEquals("A09_Station3", stations.get(2).getId());
+		Assert.assertEquals("A09_Station3", stations.get(1).getId());
+		Assert.assertEquals("A09_Station2", stations.get(2).getId());
 	}
 	
 	
