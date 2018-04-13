@@ -13,25 +13,33 @@ public class StationClientApp {
 		String uddiURL = null;
 		String wsName = null;
 		String wsURL = null;
-		if (args.length == 1) {
-			wsURL = args[0];
-		} else if (args.length >= 2) {
-			uddiURL = args[0];
-			wsName = args[1];
-		}
-
+		//if (args.length == 1) {
+		//	wsURL = args[0];
+		//} else if (args.length >= 2) {
+		//	uddiURL = args[0];
+		//	wsName = args[1];
+		//}
+		wsURL = args[0];
+		uddiURL = args[1];
+		wsName = args[2];
 		System.out.println(StationClientApp.class.getSimpleName() + " running");
 
 		// Create client.
 		StationClient client = null;
 
-		if (wsURL != null) {
-			System.out.printf("Creating client for server at %s%n", wsURL);
-			client = new StationClient(wsURL);
-		} else if (uddiURL != null) {
-			System.out.printf("Creating client using UDDI at %s for server with name %s%n", uddiURL, wsName);
-			client = new StationClient(uddiURL, wsName);
-		}
+		//if (wsURL != null) {
+		//	System.out.printf("Creating client for server at %s%n", wsURL);
+	    //	client = new StationClient(wsURL);
+		//} else if (uddiURL != null) {
+		//	System.out.printf("Creating client using UDDI at %s for server with name %s%n", uddiURL, wsName);
+		//	client = new StationClient(uddiURL, wsName);
+		//}
+		
+		System.out.println(wsName);
+		
+		client = new StationClient(uddiURL, wsName);
+		
+		System.out.println(client.getInfo().getId());
 
 		// The following remote invocation is just a basic example.
 		// The actual tests are made using JUnit.
