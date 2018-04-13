@@ -54,7 +54,6 @@ public class StationPortImpl implements StationPortType {
 		try {
 			return station.returnBina();
 		} catch (NoSlotAvailException e) {
-			// TODO Auto-generated catch block
 			throwNoSlotAvail(e.getMessage());
 		}
 		return -1;
@@ -67,7 +66,6 @@ public class StationPortImpl implements StationPortType {
 		try {
 			station.getBina();
 		} catch (NoBinaAvailException e) {
-			// TODO Auto-generated catch block
 			throwNoBinaAvail(e.getMessage());
 		}
 	}

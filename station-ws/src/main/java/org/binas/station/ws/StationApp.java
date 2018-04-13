@@ -20,7 +20,9 @@ public class StationApp {
 		String uddiURL = args[2];
 
 		StationEndpointManager endpoint = new StationEndpointManager(uddiURL,wsName, wsURL);
+		
 		Station.getInstance().setId(wsName);
+		
 
 		System.out.println(StationApp.class.getSimpleName() + " running");
 		try {
