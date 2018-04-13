@@ -26,7 +26,7 @@
 
 		<!-- instance number -->
 		<ws.i>1</ws.i>
-		<uddi.url>http://localhost:9090</uddi.url>
+		<uddi.url>http://a09:dAgMX5F@uddi.sd.rnl.tecnico.ulisboa.pt:9090/</uddi.url>
 
 		<!-- Please replace 'A09' below with your C (campus) with A (Alameda) / 
 			T (Tagus); and your group number with two digits. Then delete this comment. -->
