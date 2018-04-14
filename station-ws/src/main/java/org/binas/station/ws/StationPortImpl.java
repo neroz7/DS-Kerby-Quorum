@@ -42,8 +42,6 @@ public class StationPortImpl implements StationPortType {
 	/** Retrieve information about station. */
 	@Override
 	public StationView getInfo() {
-	// TODO
-		System.out.println("getInfo() invoked..");
 		return this.buildStationView(station);
 	}
 	

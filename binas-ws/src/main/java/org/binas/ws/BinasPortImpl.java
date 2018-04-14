@@ -52,7 +52,7 @@ public class BinasPortImpl implements BinasPortType {
 	Map<String,StationClient>stationClients = new HashMap<String,StationClient>();
 	
 	/** Constructor receives a reference to the endpoint manager. 
-	 * @throws UDDINamingException */
+	  */
 	public BinasPortImpl(BinasEndpointManager endpointManager)  {
 		this.endpointManager = endpointManager;
 		this.binas = BinasManager.getInstance();
@@ -80,34 +80,25 @@ public class BinasPortImpl implements BinasPortType {
 		return Math.sqrt( Math.pow( (c1.getX()-c2.getX()) , 2) + Math.pow( (c1.getY()-c2.getY()) , 2));	
 	}
 	
-	public synchronized Map<String, StationClient> getStationClients() throws UDDINamingException{
-    	/*if(!stationClients.isEmpty()){
-    		stationClients.clear();
-        }*/
-		//Map<String,StationClient>stationClients = new HashMap<String,StationClient>();
+	public synchronized Map<String, StationClient> getStationClients() throws UDDINamingException {
+		Map<String,StationClient>stationClients = new HashMap<String,StationClient>();
     	
     	UDDINaming uddiNaming = new UDDINaming("http://a09:dAgMX5F@uddi.sd.rnl.tecnico.ulisboa.pt:9090/");
 		 
         Collection<UDDIRecord> records = uddiNaming.listRecords("A09_Station%");
  
         for(UDDIRecord record: records) {
-            StationClient stationClient = null;
     		try {
-    			
-				System.out.println(record.getUrl());
-				//System.out.println(record.getOrgName());
+                StationClient stationClient = null;
 
-				stationClient = new StationClient("http://localhost:8082/station-ws/endpoint");//record.getUrl());
-				System.out.println(stationClient.getInfo().getId());
-
-				
-				System.out.println(stationClient.getWsURL());
+				stationClient = new StationClient(record.getUrl());
 				stationClient.setVerbose(true);
 				stationClients.put(record.getOrgName(), stationClient);
 				
 			} 
     		catch (StationClientException e) {
-				new StationClientException("Binas has no client in the url" + record.getUrl());
+    			System.out.println("Can not find Station "+ record.getOrgName()+" at "+record.getUrl());
+
     		}
         }
 
@@ -121,8 +112,6 @@ public class BinasPortImpl implements BinasPortType {
 		
 		for(StationClient st : stationClients.values()) {
 			stationsList.add(buildStationView(st.getInfo()));
-			System.out.println(st.getInfo().getId());
-
 		}
 		
 		Comparator<StationView> cmp = new Comparator<StationView>() {
