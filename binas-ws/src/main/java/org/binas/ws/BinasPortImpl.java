@@ -49,12 +49,19 @@ public class BinasPortImpl implements BinasPortType {
 	
 	private BinasManager binas;
 	
-	//Map<String,StationClient>stationClients = new HashMap<String,StationClient>();
+	Map<String,StationClient>stationClients = new HashMap<String,StationClient>();
 	
-	/** Constructor receives a reference to the endpoint manager. */
-	public BinasPortImpl(BinasEndpointManager endpointManager) {
+	/** Constructor receives a reference to the endpoint manager. 
+	 * @throws UDDINamingException */
+	public BinasPortImpl(BinasEndpointManager endpointManager)  {
 		this.endpointManager = endpointManager;
 		this.binas = BinasManager.getInstance();
+		try {
+			this.stationClients = this.getStationClients();
+		} catch (UDDINamingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	public UserView activateUser(String email) throws EmailExists_Exception, InvalidEmail_Exception {
@@ -77,7 +84,7 @@ public class BinasPortImpl implements BinasPortType {
     	/*if(!stationClients.isEmpty()){
     		stationClients.clear();
         }*/
-		Map<String,StationClient>stationClients = new HashMap<String,StationClient>();
+		//Map<String,StationClient>stationClients = new HashMap<String,StationClient>();
     	
     	UDDINaming uddiNaming = new UDDINaming("http://a09:dAgMX5F@uddi.sd.rnl.tecnico.ulisboa.pt:9090/");
 		 
@@ -90,7 +97,7 @@ public class BinasPortImpl implements BinasPortType {
 				System.out.println(record.getUrl());
 				//System.out.println(record.getOrgName());
 
-				stationClient = new StationClient(record.getUrl());
+				stationClient = new StationClient("http://localhost:8082/station-ws/endpoint");//record.getUrl());
 				System.out.println(stationClient.getInfo().getId());
 
 				
@@ -112,14 +119,10 @@ public class BinasPortImpl implements BinasPortType {
 		
 		List<StationView>stationsList = new ArrayList<StationView>();
 		
-		try {
-			for(StationClient st : getStationClients().values()) {
-				stationsList.add(buildStationView(st.getInfo()));
-				System.out.println(st.getInfo().getId());
+		for(StationClient st : stationClients.values()) {
+			stationsList.add(buildStationView(st.getInfo()));
+			System.out.println(st.getInfo().getId());
 
-			}
-		} catch (UDDINamingException e) {
-			e.printStackTrace();
 		}
 		
 		Comparator<StationView> cmp = new Comparator<StationView>() {
@@ -147,15 +150,12 @@ public class BinasPortImpl implements BinasPortType {
 	@Override
 	public StationView getInfoStation(String stationId) throws InvalidStation_Exception {
 		try {
-			if(!getStationClients().containsKey(stationId)) {
+			if(!stationClients.containsKey(stationId)) {
 				throw new InvalidStationException();
 			}
-			return buildStationView(getStationClients().get(stationId).getInfo());
+			return buildStationView(stationClients.get(stationId).getInfo());
 		} catch(InvalidStationException e) {
 			throwInvalidStationException("Can not find Station with Id: " + stationId);
-			return null;
-		} catch (UDDINamingException e) {
-			e.printStackTrace();
 			return null;
 		}
 	}
@@ -173,11 +173,11 @@ public class BinasPortImpl implements BinasPortType {
 	@Override
 	public void rentBina(String stationId, String email) throws AlreadyHasBina_Exception, InvalidStation_Exception, NoBinaAvail_Exception, NoCredit_Exception, UserNotExists_Exception {
 		try {
-			if(!getStationClients().containsKey(stationId)) {
+			if(!stationClients.containsKey(stationId)) {
 				throw new InvalidStationException();
 			}
 			User user = binas.getUser(email);
-			getStationClients().get(stationId).getBina();
+			stationClients.get(stationId).getBina();
 			user.getBina();
 			binas.getUser(email).setHasBina(true);
 		}catch(InvalidStationException e){
@@ -188,8 +188,6 @@ public class BinasPortImpl implements BinasPortType {
 			throwUserNotExistsException("No User with email "+email);
 		} catch (org.binas.station.ws.NoBinaAvail_Exception e) {
 			e.printStackTrace();
-		} catch (UDDINamingException e) {
-			e.printStackTrace();
 		} catch (AlreadyHasBinaException e) {
 			throwAlreadyHasBinaException("User with email "+email+" already has bina");
 		}
@@ -199,18 +197,16 @@ public class BinasPortImpl implements BinasPortType {
 	public void returnBina(String stationId, String email)
 			throws FullStation_Exception, InvalidStation_Exception, NoBinaRented_Exception, UserNotExists_Exception {
 		try {
-			if(!getStationClients().containsKey(stationId)) {
+			if(!stationClients.containsKey(stationId)) {
 				throw new InvalidStationException();
 			}
-			StationClient client = getStationClients().get(stationId);
+			StationClient client = stationClients.get(stationId);
 			User user = binas.getUser(email);
 			try {
 				user.returnBina(client.returnBina());
 			} catch (NoSlotAvail_Exception e) {
 				e.printStackTrace();
 			}
-		} catch (UDDINamingException e) {
-			// TODO 
 		} catch(InvalidStationException e) {
 			throwInvalidStationException("No Station with Id "+stationId);
 		} catch(NoBinaRentedException e) {
@@ -241,12 +237,8 @@ public class BinasPortImpl implements BinasPortType {
 
 	@Override
 	public void testClear() {
-		try {
-			for(StationClient client: getStationClients().values()) {
-				client.testClear();
-			}
-		} catch (UDDINamingException e) {
-			// TODO 
+		for(StationClient client: stationClients.values()) {
+			client.testClear();
 		}
 		BinasManager.getInstance().clearUsers();
 	}
@@ -256,11 +248,8 @@ public class BinasPortImpl implements BinasPortType {
 			throws BadInit_Exception {
 		StationClient client;
 		try {
-			client = getStationClients().get(stationId);
+			client = stationClients.get(stationId);
 			client.testInit(x, y, capacity, returnPrize);
-		} catch (UDDINamingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (org.binas.station.ws.BadInit_Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
