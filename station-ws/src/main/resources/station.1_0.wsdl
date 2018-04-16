@@ -4,6 +4,44 @@
 
             <!-- main service operations data types -->
 
+            <xs:complexType name="UserReplic">
+                <xs:sequence>
+                    <xs:element name="email" type="xs:string"/>
+                    <xs:element name="credit" type="xs:int"/>
+                </xs:sequence>
+            </xs:complexType>
+
+            <xs:complexType name="getBalance">
+                <xs:sequence>
+                    <xs:element name="email" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+
+            <xs:element name="getBalance" type="tns:getBalance"/>
+
+            <xs:complexType name="getBalanceResponse">
+                <xs:sequence>
+                    <xs:element name="user" type="tns:UserReplic"/>
+                </xs:sequence>
+            </xs:complexType>
+
+            <xs:element name="getBalanceResponse" type="tns:getBalanceResponse"/>
+
+            <xs:complexType name="setBalance">
+                <xs:sequence>
+                    <xs:element name="email" type="xs:string"/>
+                    <xs:element name="user" type="tns:UserReplic"/>
+                </xs:sequence>
+            </xs:complexType>
+
+            <xs:element name="setBalance" type="tns:setBalance"/>
+
+            <xs:complexType name="setBalanceResponse">
+                <xs:sequence/>
+            </xs:complexType>
+
+            <xs:element name="setBalanceResponse" type="tns:setBalanceResponse"/>
+
             <xs:complexType name="coordinatesView">
                 <xs:sequence>
                     <xs:element name="x" type="xs:int"/>
@@ -125,7 +163,24 @@
 
     <!-- Messages (use elements defined in the schema) -->
 
+    <message name="getBalance">
+        <part name="parameters" element="tns:getBalance"/>
+    </message>
+
+    <message name="getBalanceResponse">
+        <part name="parameters" element="tns:getBalanceResponse"/>
+    </message>
+
+    <message name="setBalance">
+        <part name="parameters" element="tns:setBalance"/>
+    </message>
+
+    <message name="setBalanceResponse">
+        <part name="parameters" element="tns:setBalanceResponse"/>
+    </message>
+
     <!-- main service messages -->
+
     <message name="getInfo">
         <part name="parameters" element="tns:getInfo"/>
     </message>
@@ -183,7 +238,19 @@
 
     <!-- Port Type (Interface) -->
     <portType name="StationPortType">
+
+        <operation name="getBalance">
+            <input wsam:Action="http://ws.station.binas.org/Station/getBalanceRequest" message="tns:getBalance"/>
+            <output wsam:Action="http://ws.station.binas.org/Station/getBalanceResponse" message="tns:getBalanceResponse"/>
+        </operation>
+
+        <operation name="setBalance">
+            <input wsam:Action="http://ws.station.binas.org/Station/setBalanceRequest" message="tns:setBalance"/>
+            <output wsam:Action="http://ws.station.binas.org/Station/setBalanceResponse" message="tns:setBalanceResponse"/>
+        </operation>
+
         <!-- main service operations -->
+
         <operation name="getInfo">
             <input wsam:Action="http://ws.station.binas.org/Station/getInfoRequest" message="tns:getInfo"/>
             <output wsam:Action="http://ws.station.binas.org/Station/getInfoResponse" message="tns:getInfoResponse"/>
@@ -222,6 +289,26 @@
     <!-- SOAP/HTTP Binding -->
     <binding name="StationPortBinding" type="tns:StationPortType">
         <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+
+        <operation name="getBalance">
+            <soap:operation soapAction=""/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+
+        <operation name="setBalance">
+            <soap:operation soapAction=""/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
 
         <!-- main service operations -->
         <operation name="getInfo">

@@ -3,6 +3,7 @@ package org.binas.station.ws.cli;
 import java.util.Map;
 
 import javax.xml.ws.BindingProvider;
+import javax.xml.ws.Holder;
 
 import org.binas.station.ws.BadInit_Exception;
 import org.binas.station.ws.NoBinaAvail_Exception;
@@ -10,6 +11,7 @@ import org.binas.station.ws.NoSlotAvail_Exception;
 import org.binas.station.ws.StationPortType;
 import org.binas.station.ws.StationService;
 import org.binas.station.ws.StationView;
+import org.binas.station.ws.UserReplic;
 
 import pt.ulisboa.tecnico.sdis.ws.uddi.UDDINaming;
 import pt.ulisboa.tecnico.sdis.ws.uddi.UDDINamingException;
@@ -138,6 +140,18 @@ public class StationClient implements StationPortType {
 	@Override
 	public void testInit(int x, int y, int capacity, int returnPrize) throws BadInit_Exception {
 		port.testInit(x, y, capacity, returnPrize);
+	}
+
+	@Override
+	public UserReplic getBalance(String email) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setBalance(String email, UserReplic user) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

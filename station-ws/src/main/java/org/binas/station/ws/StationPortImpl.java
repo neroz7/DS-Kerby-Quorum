@@ -37,8 +37,21 @@ public class StationPortImpl implements StationPortType {
 
 
 
-	// Main operations -------------------------------------------------------
+	@Override
+	public UserReplic getBalance(String email) {
+		return station.getBalance(email);
+	}
 
+
+
+	@Override
+	public void setBalance(String email, UserReplic user) {
+		station.setBalance(email, user);
+	}
+	
+	// Main operations -------------------------------------------------------
+	
+	
 	/** Retrieve information about station. */
 	@Override
 	public StationView getInfo() {

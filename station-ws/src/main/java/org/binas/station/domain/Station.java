@@ -1,10 +1,13 @@
 package org.binas.station.domain;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.binas.station.domain.exception.BadInitException;
 import org.binas.station.domain.exception.NoBinaAvailException;
 import org.binas.station.domain.exception.NoSlotAvailException;
+import org.binas.station.ws.UserReplic;
 
 /** Domain Root. */
 public class Station {
@@ -34,6 +37,7 @@ public class Station {
     /** Global with current number of free docks. Uses lock-free thread-safe single variable. */
     private AtomicInteger freeDocks = new AtomicInteger(0);
 
+    private Map<String , UserReplic> _users = new HashMap<String, UserReplic>();
     // Singleton -------------------------------------------------------------
 
  	/** Private constructor prevents instantiation from other classes. */
@@ -73,7 +77,18 @@ public class Station {
  	public void setId(String id) {
  		this.id = id;
  	}
-
+ 	
+ 	public synchronized void setBalance(String email, UserReplic user) {
+ 		//if(!_users.containsKey(email))
+ 		_users.put(email, user);
+ 	}
+ 	
+ 	public synchronized UserReplic getBalance(String email) {
+ 		if(!_users.containsKey(email))
+ 			return null;
+ 		return _users.get(email);
+ 	}
+ 	
  	/** Synchronized locks object before attempting to return Bina */
 	public synchronized int returnBina() throws NoSlotAvailException {
 		if(getFreeDocks() == 0)
