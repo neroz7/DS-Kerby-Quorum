@@ -19,6 +19,7 @@ import org.binas.domain.exception.NoBinaRentedException;
 import org.binas.domain.exception.NoCreditException;
 import org.binas.domain.exception.UserNotExistsException;
 import org.binas.station.ws.NoSlotAvail_Exception;
+import org.binas.station.ws.UserReplic;
 import org.binas.station.ws.cli.StationClient;
 import org.binas.station.ws.cli.StationClientException;
 
@@ -56,12 +57,7 @@ public class BinasPortImpl implements BinasPortType {
 	public BinasPortImpl(BinasEndpointManager endpointManager)  {
 		this.endpointManager = endpointManager;
 		this.binas = BinasManager.getInstance();
-		try {
-			this.stationClients = this.getStationClients();
-		} catch (UDDINamingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		this.stationClients = binas.stationClients;
 	}
 	
 	public UserView activateUser(String email) throws EmailExists_Exception, InvalidEmail_Exception {
@@ -79,31 +75,6 @@ public class BinasPortImpl implements BinasPortType {
 	private double distance(CoordinatesView c1, CoordinatesView c2) {
 		return Math.sqrt( Math.pow( (c1.getX()-c2.getX()) , 2) + Math.pow( (c1.getY()-c2.getY()) , 2));	
 	}
-	
-	public synchronized Map<String, StationClient> getStationClients() throws UDDINamingException {
-		Map<String,StationClient>stationClients = new HashMap<String,StationClient>();
-    	
-    	UDDINaming uddiNaming = new UDDINaming("http://a09:dAgMX5F@uddi.sd.rnl.tecnico.ulisboa.pt:9090/");
-		 
-        Collection<UDDIRecord> records = uddiNaming.listRecords("A09_Station%");
- 
-        for(UDDIRecord record: records) {
-    		try {
-                StationClient stationClient = null;
-
-				stationClient = new StationClient(record.getUrl());
-				stationClient.setVerbose(true);
-				stationClients.put(record.getOrgName(), stationClient);
-				
-			} 
-    		catch (StationClientException e) {
-    			System.out.println("Can not find Station "+ record.getOrgName()+" at "+record.getUrl());
-
-    		}
-        }
-
-        return stationClients;
-    }
 	
 	@Override
 	public List<StationView> listStations(Integer numberOfStations, CoordinatesView coordinates){
