@@ -50,6 +50,8 @@ public class BinasPortImpl implements BinasPortType {
 	
 	private BinasManager binas;
 	
+	private boolean replicated = true;
+	
 	Map<String,StationClient>stationClients = new HashMap<String,StationClient>();
 	
 	/** Constructor receives a reference to the endpoint manager. 
@@ -122,29 +124,44 @@ public class BinasPortImpl implements BinasPortType {
 
 	@Override
 	public int getCredit(String email) throws UserNotExists_Exception {
+		if(!replicated)
 		try {
 			return binas.getCredit(email);
 		}catch(UserNotExistsException e) {
 			throwUserNotExistsException("No User with email "+email);
 			return -1;
 		}
+		else
+			return binas.getCreditReplic(email);
 	}
 
 	@Override
 	public void rentBina(String stationId, String email) throws AlreadyHasBina_Exception, InvalidStation_Exception, NoBinaAvail_Exception, NoCredit_Exception, UserNotExists_Exception {
 		try {
+			UserReplic usr = null;
 			if(!stationClients.containsKey(stationId)) {
 				throw new InvalidStationException();
 			}
 			User user = binas.getUser(email);
+			if(replicated)
+				usr = binas.getUserReplic(email);
+			
+			if(user.isHasBina())
+				throw new AlreadyHasBinaException();
+			else {
+				user.setHasBina(true);
+				if(!replicated)
+					user.setCredit(user.getCredit()+1);
+				else
+					binas.incCredit(email);
+			}
 			stationClients.get(stationId).getBina();
-			user.getBina();
-			binas.getUser(email).setHasBina(true);
-		}catch(InvalidStationException e){
+						
+		} catch(InvalidStationException e){
 			throwInvalidStationException("No Station with Id "+stationId);
-		}catch(NoCreditException e){
+		} /*catch(NoCreditException e){
 			throwNoCreditException("No enough credit with user "+email);
-		}catch(UserNotExistsException e){
+		}*/ catch(UserNotExistsException e){
 			throwUserNotExistsException("No User with email "+email);
 		} catch (org.binas.station.ws.NoBinaAvail_Exception e) {
 			e.printStackTrace();
@@ -157,13 +174,20 @@ public class BinasPortImpl implements BinasPortType {
 	public void returnBina(String stationId, String email)
 			throws FullStation_Exception, InvalidStation_Exception, NoBinaRented_Exception, UserNotExists_Exception {
 		try {
+			UserReplic usr = null;
 			if(!stationClients.containsKey(stationId)) {
 				throw new InvalidStationException();
 			}
 			StationClient client = stationClients.get(stationId);
 			User user = binas.getUser(email);
+			if(replicated)
+				usr = binas.getUserReplic(email);
+
 			try {
-				user.returnBina(client.returnBina());
+				if(!replicated)
+					user.returnBina(client.returnBina());
+				else
+					binas.returnBina(email, client.returnBina());
 			} catch (NoSlotAvail_Exception e) {
 				e.printStackTrace();
 			}
@@ -219,15 +243,20 @@ public class BinasPortImpl implements BinasPortType {
 
 	@Override
 	public void testInit(int userInitialPoints) throws BadInit_Exception {
+		if(!replicated)
 		for(User user: binas.getUsers().values())
 			try {
 				user.testInit(userInitialPoints);
 			} catch (BadInitException e) {
 				throwBadInitException("bad inital point" + userInitialPoints);
 			}
-		
+		else
+			try {
+				binas.testInit(userInitialPoints);
+			} catch (BadInitException e) {
+				throwBadInitException("bad inital point" + userInitialPoints);
+			} 
 	}
-	
 	//Views Builders
 	
 	private StationView buildStationView(org.binas.station.ws.StationView oldStation) {

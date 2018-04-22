@@ -1,5 +1,6 @@
 package org.binas.station.domain;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -63,7 +64,35 @@ public class Station {
  		this.maxCapacity = capacity;
  		this.bonus = returnPrize;
  	}
+	public synchronized void testInitUsers(int userInitialPoints) {
+		for(UserReplic user : _users.values()) {
+			//System.out.println("Init with " + userInitialPoints + " "+ user.getEmail());
+			user.setCredit(userInitialPoints);
+			_users.replace(user.getEmail(), user);
+		}
+		
+	}
+ 	public synchronized void setBalance(String email, UserReplic new_user) {
+ 		if(_users.containsKey(email)) {
+ 			UserReplic user = _users.get(email);
+ 			if(new_user.getSeq() > user.getSeq() || (new_user.getSeq() == user.getSeq() && new_user.getCid() > user.getCid())) {
+ 				//System.out.println(""+user.getEmail()+": Replace "+ user.getCredit() +" with " + new_user.getCredit());
+ 				_users.replace(email, new_user);
+ 			}
+ 		}
+ 		else {
+ 			_users.put(email, new_user);
+ 		}
+ 	}
  	
+ 	public synchronized UserReplic getBalance(String email) {
+ 		if(_users.containsKey(email))
+ 			return _users.get(email);
+ 		
+ 		UserReplic u = new UserReplic();
+ 		u.setEmail(null);
+ 		return u;
+ 	}
 	public synchronized void reset() {
  		freeDocks.set(0);
  		maxCapacity = DEFAULT_MAX_CAPACITY;
@@ -77,16 +106,39 @@ public class Station {
  	public void setId(String id) {
  		this.id = id;
  	}
+
  	
- 	public synchronized void setBalance(String email, UserReplic user) {
- 		//if(!_users.containsKey(email))
- 		_users.put(email, user);
+ 	
+ 	public synchronized UserReplic getMaxTagUser() {
+ 		int maxseq = 0, maxcid = 0;
+ 		UserReplic res_user = new UserReplic();
+ 		res_user.setEmail(null);
+ 		for(UserReplic usr : _users.values()) {
+			if(usr.getSeq() > maxseq || (usr.getSeq() == maxseq && usr.getCid() > maxcid)){
+				maxseq = usr.getSeq();
+				maxcid = usr.getCid();
+				res_user = usr;
+			}
+
+ 		}
+ 		return res_user;
  	}
- 	
- 	public synchronized UserReplic getBalance(String email) {
- 		if(!_users.containsKey(email))
- 			return null;
- 		return _users.get(email);
+ 	 	
+ 	public synchronized UserReplic getMaxTagUserByName(String email) {
+ 		int maxseq = 0, maxcid = 0;
+ 		UserReplic res_user = new UserReplic();
+ 		res_user.setEmail(null);		
+ 		for(UserReplic usr : _users.values()) {
+ 			if(email.equals(usr.getEmail())) {
+ 				if(usr.getSeq() > maxseq || (usr.getSeq() == maxseq && usr.getCid() > maxcid)){
+ 					maxseq = usr.getSeq();
+ 					maxcid = usr.getCid();
+ 					res_user = usr;
+ 				}
+			}
+
+ 		}
+ 		return res_user;
  	}
  	
  	/** Synchronized locks object before attempting to return Bina */
@@ -146,5 +198,6 @@ public class Station {
     public synchronized int getAvailableBinas() {
     	return maxCapacity - freeDocks.get();
     }
+
     	
 }

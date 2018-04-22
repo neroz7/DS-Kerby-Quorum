@@ -1,6 +1,7 @@
 package org.binas.station.ws;
 
 import javax.jws.WebService;
+import javax.xml.ws.Holder;
 
 import org.binas.station.domain.Coordinates;
 import org.binas.station.domain.Station;
@@ -33,6 +34,16 @@ public class StationPortImpl implements StationPortType {
 	public StationPortImpl(StationEndpointManager endpointManager) {
 		this.endpointManager = endpointManager;
 		this.station = Station.getInstance();
+	}
+
+	@Override
+	public UserReplic getMaxTagUser() {
+		return station.getMaxTagUser();
+	}
+
+	@Override
+	public UserReplic getMaxTagUserByName(String email) {
+		return station.getMaxTagUserByName(email);
 	}
 
 
@@ -110,6 +121,10 @@ public class StationPortImpl implements StationPortType {
 		station.reset();
 
 	}
+	@Override
+	public void testInitUsers(int userInitialPoints) {
+		station.testInitUsers(userInitialPoints);
+	}
 	
 	/** Set station variables with specific values. */
 	@Override
@@ -168,5 +183,7 @@ public class StationPortImpl implements StationPortType {
 		faultInfo.message = message;
 		throw new BadInit_Exception(message, faultInfo);
 	}
+
+
 
 }

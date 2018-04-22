@@ -16,4 +16,5 @@ cd ..
 cd binas-ws-cli
 sleep $((2*$time_per_mvn));
 #gnome-terminal -e "mvn compile exec:java"
-gnome-terminal -e "mvn verify"
+#gnome-terminal -e "mvn verify"
+gnome-terminal -e 'bash -c "mvn verify; read line"'

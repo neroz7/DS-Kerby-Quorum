@@ -144,14 +144,29 @@ public class StationClient implements StationPortType {
 
 	@Override
 	public UserReplic getBalance(String email) {
-		// TODO Auto-generated method stub
-		return null;
+		return port.getBalance(email);
 	}
 
 	@Override
 	public void setBalance(String email, UserReplic user) {
-		// TODO Auto-generated method stub
-		
+		port.setBalance(email, user);
 	}
+
+	@Override
+	public UserReplic getMaxTagUser() {
+		return port.getMaxTagUser();
+	}
+
+	@Override
+	public UserReplic getMaxTagUserByName(String email) {
+		return port.getMaxTagUserByName(email);
+	}
+
+	@Override
+	public void testInitUsers(int userInitialPoints) {
+		port.testInitUsers(userInitialPoints);
+	}
+
+
 
 }

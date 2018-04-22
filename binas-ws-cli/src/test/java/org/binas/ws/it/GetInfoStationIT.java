@@ -37,18 +37,27 @@ public class GetInfoStationIT extends BaseIT{
 		
 		try {
 			Assert.assertEquals(0, client.getCredit("ist427068@tecnico.ulisboa.pt"));
+			Assert.assertEquals(0, client.getCredit("alisyr1356h@gmail.com"));
+			Assert.assertEquals(0, client.getCredit("pedromela@ist.utl.pt"));
+			Assert.assertEquals(0, client.getCredit("fred@gmail.com"));
+
 			client.testInit(10);
+			
+			Assert.assertEquals(10, client.getCredit("ist427068@tecnico.ulisboa.pt"));
 			Assert.assertEquals(10, client.getCredit("alisyr1356h@gmail.com"));
+			Assert.assertEquals(10, client.getCredit("pedromela@ist.utl.pt"));
+			Assert.assertEquals(10, client.getCredit("fred@gmail.com"));
 			
 			
 			
-			client.rentBina("A09_Station1", "alisyr1356h@gmail.com");
-			
-			Assert.assertEquals(11, client.getCredit("alisyr1356h@gmail.com"));
-			
-			client.rentBina("A09_Station1", "ist427068@tecnico.ulisboa.pt");
+			client.rentBina("A09_Station1", "alisyr1356h@gmail.com");			
+			client.rentBina("A09_Station1", "ist427068@tecnico.ulisboa.pt");			
 			client.rentBina("A09_Station1", "pedromela@ist.utl.pt");
 			client.rentBina("A09_Station1", "fred@gmail.com");
+			Assert.assertEquals(11, client.getCredit("alisyr1356h@gmail.com"));
+			Assert.assertEquals(11, client.getCredit("ist427068@tecnico.ulisboa.pt"));
+			Assert.assertEquals(11, client.getCredit("pedromela@ist.utl.pt"));
+			Assert.assertEquals(11, client.getCredit("fred@gmail.com"));
 	
 			StationView stationView = client.getInfoStation("A09_Station1");
 			Assert.assertEquals(2, stationView.getAvailableBinas());
@@ -57,10 +66,13 @@ public class GetInfoStationIT extends BaseIT{
 			client.returnBina("A09_Station1", "ist427068@tecnico.ulisboa.pt");
 			client.returnBina("A09_Station1", "pedromela@ist.utl.pt");
 			client.returnBina("A09_Station1", "fred@gmail.com");
-	
-			stationView = client.getInfoStation("A09_Station1");
-
 			Assert.assertEquals(13, client.getCredit("alisyr1356h@gmail.com"));
+			Assert.assertEquals(13, client.getCredit("ist427068@tecnico.ulisboa.pt"));
+			Assert.assertEquals(13, client.getCredit("pedromela@ist.utl.pt"));
+			Assert.assertEquals(13, client.getCredit("fred@gmail.com"));
+			
+			
+			stationView = client.getInfoStation("A09_Station1");
 			Assert.assertEquals(4, stationView.getTotalGets());
 			Assert.assertEquals(4, stationView.getTotalReturns());
 			Assert.assertEquals(6, stationView.getAvailableBinas());
