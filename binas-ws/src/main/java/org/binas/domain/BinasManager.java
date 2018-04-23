@@ -36,11 +36,9 @@ public class BinasManager {
 	private String id;
 	private int cid;
 	private int N;
-	private Collection<UserReplic> Quorum= new ArrayList<UserReplic>();
 	private int cycle = 100; //miliseconds
 	private int timeout = 5000;//miliseconds
-	private Queue<Collection<UserReplic>> QuorumReadsueue= new PriorityQueue<Collection<UserReplic>>();
-    
+	
 	private Map<Integer , Collection<UserReplic>> QuorumReads = new ConcurrentHashMap<Integer, Collection<UserReplic>>();
     private Map<Integer , Integer> QuorumWrites = new ConcurrentHashMap<Integer, Integer>();
 
@@ -49,8 +47,6 @@ public class BinasManager {
 
 	private int response_number = 0;
 	private int request_number = 0;
-
-	private int finished;
 
 	private BinasManager() {
 		
@@ -218,8 +214,6 @@ public class BinasManager {
 		
 		QuorumReads.remove(request_number);
 		//reset Quorum
-		finished = 0;
-		Quorum.clear();
 		System.out.println("Quorum Read : User " + max.getEmail()+ " found!");
 		
 		return max;
@@ -314,7 +308,8 @@ public class BinasManager {
 			@Override
 	        public void handleResponse(Response<GetBalanceResponse> response) {
 	            try {
-	            	UserReplic u = response.get().getUser();	            	
+	            	UserReplic u = response.get().getUser();
+	            	if(u.getRequestId() >=request_number){
 	            	if(u != null && u.getEmail() != null) {
 	            		if(QuorumReads.containsKey(u.getRequestId())){
 	            			QuorumReads.get(u.getRequestId()).add(u);
@@ -324,15 +319,12 @@ public class BinasManager {
 	            			QuorumReads.put(u.getRequestId(), aux);
 	            		}
 	            		if(u.getRequestId() == request_number){
-	            			//Quorum.add(u);
-	    	                //finished++;
-	            		}
-	            		else
 			                System.out.println(u.getEmail()+"AsyncHandler : has diferent request id was " + u.getRequestId()+" and should be "+request_number);	            			
-	     
+	            		}	     
 	            	}	
 	            	else
 		                System.out.print("AsyncHandler : Received Async NULL");
+	            	}
 	            		
 	            } catch (InterruptedException e) {
 	                System.out.println("Caught interrupted exception.");
@@ -355,6 +347,7 @@ public class BinasManager {
 	        public void handleResponse(Response<SetBalanceResponse> response) {
 	            try {
 	                int id = response.get().getId();
+	                if(id >= response_number) {
             		if(QuorumWrites.containsKey(id)){
             			QuorumWrites.replace(id, QuorumWrites.get(id)+1);
             		}else{
@@ -362,8 +355,7 @@ public class BinasManager {
             		}
             		if(id != response_number)
 		                System.out.println("AsyncHandler : has diferent request id was " + id+" and should be "+request_number);	            			
-	                //Quorum.add(response.get().getUser());
-	                finished++;
+	                }
 	            } catch (InterruptedException e) {
 	                System.out.println("Caught interrupted exception.");
 	                System.out.print("Cause: ");
