@@ -124,6 +124,7 @@ public class BinasClient{ // implements BinasPortType {
 	
 	 public void rentBina(String stationId, String email) throws AlreadyHasBina_Exception, InvalidStation_Exception, NoBinaAvail_Exception, NoCredit_Exception, UserNotExists_Exception {
 		 port.rentBina(stationId,email);
+		 
 	 }
 	
 	 public void returnBina(String stationId, String email) throws FullStation_Exception, InvalidStation_Exception, NoBinaRented_Exception, UserNotExists_Exception {

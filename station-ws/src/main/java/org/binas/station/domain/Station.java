@@ -3,6 +3,7 @@ package org.binas.station.domain;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.binas.station.domain.exception.BadInitException;
@@ -38,7 +39,7 @@ public class Station {
     /** Global with current number of free docks. Uses lock-free thread-safe single variable. */
     private AtomicInteger freeDocks = new AtomicInteger(0);
 
-    private Map<String , UserReplic> _users = new HashMap<String, UserReplic>();
+    private Map<String , UserReplic> _users = new ConcurrentHashMap<String, UserReplic>();
     // Singleton -------------------------------------------------------------
 
  	/** Private constructor prevents instantiation from other classes. */
@@ -72,7 +73,7 @@ public class Station {
 		}
 		
 	}
- 	public synchronized void setBalance(String email, UserReplic new_user) {
+ 	public synchronized int setBalance(String email, UserReplic new_user, int request_id) {
  		if(_users.containsKey(email)) {
  			UserReplic user = _users.get(email);
  			if(new_user.getSeq() > user.getSeq() || (new_user.getSeq() == user.getSeq() && new_user.getCid() > user.getCid())) {
@@ -83,14 +84,19 @@ public class Station {
  		else {
  			_users.put(email, new_user);
  		}
+ 		return request_id;
  	}
  	
- 	public synchronized UserReplic getBalance(String email) {
- 		if(_users.containsKey(email))
- 			return _users.get(email);
- 		
- 		UserReplic u = new UserReplic();
+ 	public synchronized UserReplic getBalance(String email, int request_id) {
+ 		UserReplic u;
+ 		if(_users.containsKey(email)){
+ 			u =  _users.get(email);
+ 			u.setRequestId(request_id);
+ 			return u;
+ 		}
+ 		u = new UserReplic();
  		u.setEmail(null);
+ 		u.setRequestId(request_id);
  		return u;
  	}
 	public synchronized void reset() {
@@ -107,40 +113,6 @@ public class Station {
  		this.id = id;
  	}
 
- 	
- 	
- 	public synchronized UserReplic getMaxTagUser() {
- 		int maxseq = 0, maxcid = 0;
- 		UserReplic res_user = new UserReplic();
- 		res_user.setEmail(null);
- 		for(UserReplic usr : _users.values()) {
-			if(usr.getSeq() > maxseq || (usr.getSeq() == maxseq && usr.getCid() > maxcid)){
-				maxseq = usr.getSeq();
-				maxcid = usr.getCid();
-				res_user = usr;
-			}
-
- 		}
- 		return res_user;
- 	}
- 	 	
- 	public synchronized UserReplic getMaxTagUserByName(String email) {
- 		int maxseq = 0, maxcid = 0;
- 		UserReplic res_user = new UserReplic();
- 		res_user.setEmail(null);		
- 		for(UserReplic usr : _users.values()) {
- 			if(email.equals(usr.getEmail())) {
- 				if(usr.getSeq() > maxseq || (usr.getSeq() == maxseq && usr.getCid() > maxcid)){
- 					maxseq = usr.getSeq();
- 					maxcid = usr.getCid();
- 					res_user = usr;
- 				}
-			}
-
- 		}
- 		return res_user;
- 	}
- 	
  	/** Synchronized locks object before attempting to return Bina */
 	public synchronized int returnBina() throws NoSlotAvailException {
 		if(getFreeDocks() == 0)

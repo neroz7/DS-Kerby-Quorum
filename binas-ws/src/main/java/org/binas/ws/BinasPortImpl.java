@@ -6,8 +6,12 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Future;
 
 import javax.jws.WebService;
+import javax.xml.ws.AsyncHandler;
+import javax.xml.ws.Response;
+
 import org.binas.domain.BinasManager;
 import org.binas.domain.User;
 import org.binas.domain.exception.AlreadyHasBinaException;
@@ -143,8 +147,8 @@ public class BinasPortImpl implements BinasPortType {
 				throw new InvalidStationException();
 			}
 			User user = binas.getUser(email);
-			if(replicated)
-				usr = binas.getUserReplic(email);
+			//if(replicated)
+				//usr = binas.getUserReplic(email);
 			
 			if(user.isHasBina())
 				throw new AlreadyHasBinaException();
@@ -180,8 +184,8 @@ public class BinasPortImpl implements BinasPortType {
 			}
 			StationClient client = stationClients.get(stationId);
 			User user = binas.getUser(email);
-			if(replicated)
-				usr = binas.getUserReplic(email);
+			//if(replicated)
+				//usr = binas.getUserReplic(email);
 
 			try {
 				if(!replicated)
@@ -336,5 +340,6 @@ public class BinasPortImpl implements BinasPortType {
 		faultInfo.message = message;
 		throw new NoBinaRented_Exception(message, faultInfo);
 	}
+
 	
 }

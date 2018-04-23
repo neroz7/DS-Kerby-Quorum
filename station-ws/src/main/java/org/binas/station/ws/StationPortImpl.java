@@ -36,28 +36,17 @@ public class StationPortImpl implements StationPortType {
 		this.station = Station.getInstance();
 	}
 
-	@Override
-	public UserReplic getMaxTagUser() {
-		return station.getMaxTagUser();
-	}
 
 	@Override
-	public UserReplic getMaxTagUserByName(String email) {
-		return station.getMaxTagUserByName(email);
+	public UserReplic getBalance(String email, int request_id) {
+		return station.getBalance(email, request_id);
 	}
 
 
 
 	@Override
-	public UserReplic getBalance(String email) {
-		return station.getBalance(email);
-	}
-
-
-
-	@Override
-	public void setBalance(String email, UserReplic user) {
-		station.setBalance(email, user);
+	public int setBalance(String email, UserReplic user, int request_id) {
+		return station.setBalance(email, user, request_id);
 	}
 	
 	// Main operations -------------------------------------------------------

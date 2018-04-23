@@ -1,16 +1,29 @@
 package org.binas.station.ws.cli;
 
 import java.util.Map;
+import java.util.concurrent.Future;
+
+import javax.xml.ws.AsyncHandler;
 
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Holder;
+import javax.xml.ws.Response;
 
 import org.binas.station.ws.BadInit_Exception;
+import org.binas.station.ws.GetBalanceResponse;
+import org.binas.station.ws.GetBinaResponse;
+import org.binas.station.ws.GetInfoResponse;
 import org.binas.station.ws.NoBinaAvail_Exception;
 import org.binas.station.ws.NoSlotAvail_Exception;
+import org.binas.station.ws.ReturnBinaResponse;
+import org.binas.station.ws.SetBalanceResponse;
 import org.binas.station.ws.StationPortType;
 import org.binas.station.ws.StationService;
 import org.binas.station.ws.StationView;
+import org.binas.station.ws.TestClearResponse;
+import org.binas.station.ws.TestInitResponse;
+import org.binas.station.ws.TestInitUsersResponse;
+import org.binas.station.ws.TestPingResponse;
 import org.binas.station.ws.UserReplic;
 
 import pt.ulisboa.tecnico.sdis.ws.uddi.UDDINaming;
@@ -26,7 +39,6 @@ import static javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY;
  */
 // TODO implement Port Type interface
 public class StationClient implements StationPortType {
-
 	/** WS service */
 	StationService service = null;
 
@@ -143,29 +155,131 @@ public class StationClient implements StationPortType {
 	}
 
 	@Override
-	public UserReplic getBalance(String email) {
-		return port.getBalance(email);
+	public UserReplic getBalance(String email, int not_used_here) {
+		return port.getBalance(email,0);
 	}
 
 	@Override
-	public void setBalance(String email, UserReplic user) {
-		port.setBalance(email, user);
-	}
-
-	@Override
-	public UserReplic getMaxTagUser() {
-		return port.getMaxTagUser();
-	}
-
-	@Override
-	public UserReplic getMaxTagUserByName(String email) {
-		return port.getMaxTagUserByName(email);
+	public int setBalance(String email, UserReplic user, int request_id) {
+		return port.setBalance(email, user, request_id);
 	}
 
 	@Override
 	public void testInitUsers(int userInitialPoints) {
 		port.testInitUsers(userInitialPoints);
 	}
+
+	
+	@Override
+	public Response<GetBalanceResponse> getBalanceAsync(String email, int request_id) {
+		// TODO Auto-generated method stub
+		return port.getBalanceAsync(email, request_id);
+	}
+
+	@Override
+	public Future<?> getBalanceAsync(String email, int request_id, AsyncHandler<GetBalanceResponse> asyncHandler) {
+		// TODO Auto-generated method stub
+		return port.getBalanceAsync(email, request_id ,asyncHandler);
+	}
+
+	@Override
+	public Response<SetBalanceResponse> setBalanceAsync(String email, UserReplic user, int id) {
+		// TODO Auto-generated method stub
+		return port.setBalanceAsync(email, user, id);
+	}
+
+	@Override
+	public Future<?> setBalanceAsync(String email, UserReplic user, int id ,AsyncHandler<SetBalanceResponse> asyncHandler) {
+		// TODO Auto-generated method stub
+		return port.setBalanceAsync(email, user, id ,asyncHandler);
+	}
+
+	@Override
+	public Response<GetInfoResponse> getInfoAsync() {
+		// TODO Auto-generated method stub
+		return port.getInfoAsync();
+	}
+
+	@Override
+	public Future<?> getInfoAsync(AsyncHandler<GetInfoResponse> asyncHandler) {
+		// TODO Auto-generated method stub
+		return port.getInfoAsync(asyncHandler);
+	}
+
+	@Override
+	public Response<GetBinaResponse> getBinaAsync() {
+		// TODO Auto-generated method stub
+		return port.getBinaAsync();
+	}
+
+	@Override
+	public Future<?> getBinaAsync(AsyncHandler<GetBinaResponse> asyncHandler) {
+		// TODO Auto-generated method stub
+		return port.getBinaAsync(asyncHandler);
+	}
+
+	@Override
+	public Response<ReturnBinaResponse> returnBinaAsync() {
+		// TODO Auto-generated method stub
+		return port.returnBinaAsync();
+	}
+
+	@Override
+	public Future<?> returnBinaAsync(AsyncHandler<ReturnBinaResponse> asyncHandler) {
+		// TODO Auto-generated method stub
+		return port.returnBinaAsync(asyncHandler);
+	}
+
+	@Override
+	public Response<TestPingResponse> testPingAsync(String inputMessage) {
+		// TODO Auto-generated method stub
+		return port.testPingAsync(inputMessage);
+	}
+
+	@Override
+	public Future<?> testPingAsync(String inputMessage, AsyncHandler<TestPingResponse> asyncHandler) {
+		// TODO Auto-generated method stub
+		return port.testPingAsync(inputMessage, asyncHandler);
+	}
+
+	@Override
+	public Response<TestClearResponse> testClearAsync() {
+		// TODO Auto-generated method stub
+		return port.testClearAsync();
+	}
+
+	@Override
+	public Future<?> testClearAsync(AsyncHandler<TestClearResponse> asyncHandler) {
+		// TODO Auto-generated method stub
+		return port.testClearAsync(asyncHandler);
+	}
+
+	@Override
+	public Response<TestInitResponse> testInitAsync(int x, int y, int capacity, int returnPrize) {
+		// TODO Auto-generated method stub
+		return port.testInitAsync(x, y, capacity, returnPrize);
+	}
+
+	@Override
+	public Future<?> testInitAsync(int x, int y, int capacity, int returnPrize,
+			AsyncHandler<TestInitResponse> asyncHandler) {
+		// TODO Auto-generated method stub
+		return port.testInitAsync(x, y, capacity, returnPrize, asyncHandler);
+	}
+
+	@Override
+	public Response<TestInitUsersResponse> testInitUsersAsync(int userInitialPoints) {
+		// TODO Auto-generated method stub
+		return port.testInitUsersAsync(userInitialPoints);
+	}
+
+	@Override
+	public Future<?> testInitUsersAsync(int userInitialPoints, AsyncHandler<TestInitUsersResponse> asyncHandler) {
+		// TODO Auto-generated method stub
+		return port.testInitUsersAsync(userInitialPoints, asyncHandler);
+	}
+
+	
 
 
 
