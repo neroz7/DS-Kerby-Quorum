@@ -1,5 +1,6 @@
 package org.binas.ws;
 
+import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -88,7 +89,10 @@ public class BinasPortImpl implements BinasPortType {
 		List<StationView>stationsList = new ArrayList<StationView>();
 		
 		for(StationClient st : stationClients.values()) {
-			stationsList.add(buildStationView(st.getInfo()));
+			try{
+				stationsList.add(buildStationView(st.getInfo()));
+				
+			} catch(Exception e) {}
 		}
 		
 		Comparator<StationView> cmp = new Comparator<StationView>() {
@@ -106,7 +110,7 @@ public class BinasPortImpl implements BinasPortType {
 		
 		System.out.println(stationsList.size());
 		List<StationView> res = new ArrayList<StationView>();
-		for(int i = 0; i < numberOfStations; i++) {
+		for(int i = 0; i < stationsList.size(); i++) {
 			//System.out.println(stationsList.get(i).getId());
 			res.add(stationsList.get(i));
 		}
@@ -226,22 +230,24 @@ public class BinasPortImpl implements BinasPortType {
 	@Override
 	public void testClear() {
 		for(StationClient client: stationClients.values()) {
-			client.testClear();
+			try{
+				client.testClear();				
+			} catch(Exception e) {}
 		}
-		BinasManager.getInstance().clearUsers();
-	}
+		//BinasManager.getInstance().clearUsers();
+		binas.clearUsers();
+}
 
 	@Override
 	public void testInitStation(String stationId, int x, int y, int capacity, int returnPrize)
 			throws BadInit_Exception {
 		StationClient client;
 		try {
-			client = stationClients.get(stationId);
+			client = stationClients.get(stationId);			
 			client.testInit(x, y, capacity, returnPrize);
 		} catch (org.binas.station.ws.BadInit_Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		} catch(Exception e) {}
 		
 	}
 
@@ -259,7 +265,7 @@ public class BinasPortImpl implements BinasPortType {
 				binas.testInit(userInitialPoints);
 			} catch (BadInitException e) {
 				throwBadInitException("bad inital point" + userInitialPoints);
-			} 
+			} catch(Exception e) {} 
 	}
 	//Views Builders
 	

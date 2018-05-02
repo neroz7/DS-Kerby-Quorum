@@ -100,15 +100,17 @@ public class BinasManager {
 		/*new implementation*/
 		/*Quorum init sincrono*/
 		for(StationClient st : stationClients.values()) {	
-			UserReplic userR = st.getBalance(email,0);
-			if(userR.getEmail() == null) {
-				UserReplic usr = new UserReplic();
-				usr.setEmail(email);
-				usr.setCredit(0);
-				usr.setSeq(0);
-				usr.setCid(cid);
-				st.setBalance(email, usr , 0);
-			}
+			try{
+				UserReplic userR = st.getBalance(email,0);
+				if(userR.getEmail() == null) {
+					UserReplic usr = new UserReplic();
+					usr.setEmail(email);
+					usr.setCredit(0);
+					usr.setSeq(0);
+					usr.setCid(cid);
+					st.setBalance(email, usr , 0);
+				}
+			} catch(Exception e) {}
 		}
 		
 		return user;
@@ -239,7 +241,7 @@ public class BinasManager {
 	
     public void incCredit(String email) {
 		/*Quorum Write*/
-		request_number++;
+		response_number++;
 		QuorumWrites.put(response_number, 0);
 
     	UserReplic maxTagUser = getUserReplic(email);
@@ -256,7 +258,7 @@ public class BinasManager {
 	
 	public void returnBina(String email, int stationBonus) throws UserNotExistsException {
 		/*Quorum Write*/
-		request_number++;
+		response_number++;
 		QuorumWrites.put(response_number, 0);
 		
 		UserReplic maxTagUser = getUserReplic(email);
@@ -318,7 +320,7 @@ public class BinasManager {
 	            			aux.add(u);
 	            			QuorumReads.put(u.getRequestId(), aux);
 	            		}
-	            		if(u.getRequestId() == request_number){
+	            		if(u.getRequestId() != request_number){
 			                System.out.println(u.getEmail()+"AsyncHandler : has diferent request id was " + u.getRequestId()+" and should be "+request_number);	            			
 	            		}	     
 	            	}	
