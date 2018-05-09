@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
 
+import javax.jws.HandlerChain;
 import javax.jws.WebService;
 import javax.xml.ws.AsyncHandler;
 import javax.xml.ws.Response;
@@ -38,6 +39,7 @@ import pt.ulisboa.tecnico.sdis.ws.uddi.UDDIRecord;
  * below "map" the Java class to the WSDL definitions.
  */
 // TODO
+@HandlerChain(file = "/binas-ws_handler-chain.xml")
  @WebService(endpointInterface = "org.binas.ws.BinasPortType",
  wsdlLocation = "binas.1_0.wsdl",
  name ="BinasWebService",
