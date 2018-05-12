@@ -37,8 +37,30 @@ public class KerberosServerHandler implements SOAPHandler<SOAPMessageContext> {
 	 */
 	@Override
 	public boolean handleMessage(SOAPMessageContext smc) {
-		return true;
-	}
+		System.out.println("KerberosServerHeaderHandler: Handling message.");
+
+		Boolean outboundElement = (Boolean) smc.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
+
+		try {
+			if (outboundElement.booleanValue()) {
+				System.out.println("Writing header to OUTbound SOAP message...");
+
+				
+
+			} else {
+				System.out.println("Reading header from INbound SOAP message...");
+
+				
+
+			}
+		} catch (Exception e) {
+			System.out.print("Caught exception in handleMessage: ");
+			System.out.println(e);
+			System.out.println("Continue normal processing...");
+		}
+
+		
+		return true;	}
 
 	/** The handleFault method is invoked for fault message processing. */
 	@Override

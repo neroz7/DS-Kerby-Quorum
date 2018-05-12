@@ -60,6 +60,7 @@ public class HeaderHandler implements SOAPHandler<SOAPMessageContext> {
 				SOAPMessage msg = smc.getMessage();
 				SOAPPart sp = msg.getSOAPPart();
 				SOAPEnvelope se = sp.getEnvelope();
+				
 
 				// add header
 				SOAPHeader sh = se.getHeader();
@@ -68,6 +69,7 @@ public class HeaderHandler implements SOAPHandler<SOAPMessageContext> {
 
 				// add header element (name, namespace prefix, namespace)
 				Name name = se.createName("myHeader", "d", "http://demo");
+				
 				SOAPHeaderElement element = sh.addHeaderElement(name);
 
 				// add header element value
