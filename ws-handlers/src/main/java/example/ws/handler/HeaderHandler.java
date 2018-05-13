@@ -101,7 +101,7 @@ public class HeaderHandler implements SOAPHandler<SOAPMessageContext> {
 					return true;
 				}
 				SOAPElement element = (SOAPElement) it.next();
-
+				
 				// get header element value
 				String valueString = element.getValue();
 				int value = Integer.parseInt(valueString);

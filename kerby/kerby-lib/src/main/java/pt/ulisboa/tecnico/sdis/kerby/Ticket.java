@@ -61,6 +61,12 @@ public class Ticket {
 		decipher(cipheredView, key);
 	}
 
+	/** Create Ticket from argument an XML Node.
+	 * @param node An XML Node containing an Auth
+	 * */
+	public Ticket(Node node) throws JAXBException {
+		fromXMLNode(node);
+	}
 	// After construction, view can never be null, and can never be set to null.
 	// This invariant is assumed to be true in the remaining code.
 

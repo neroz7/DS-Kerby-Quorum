@@ -1,5 +1,6 @@
 package example.ws.handler;
 
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -25,6 +26,7 @@ import org.w3c.dom.Node;
 
 import pt.ulisboa.tecnico.sdis.kerby.Auth;
 import pt.ulisboa.tecnico.sdis.kerby.CipheredView;
+import pt.ulisboa.tecnico.sdis.kerby.RequestTime;
 import pt.ulisboa.tecnico.sdis.kerby.SecurityHelper;
 import pt.ulisboa.tecnico.sdis.kerby.SessionKey;
 import pt.ulisboa.tecnico.sdis.kerby.SessionKeyAndTicketView;
@@ -36,6 +38,11 @@ import pt.ulisboa.tecnico.sdis.kerby.cli.KerbyClient;
  */
 public class KerberosClientHandler implements SOAPHandler<SOAPMessageContext> {
 
+	private static final String VALID_CLIENT_NAME = "alice@A09.binas.org";
+	private static final String VALID_CLIENT_PASSWORD = "tzpxRB7";
+	private static final String VALID_SERVER_NAME = "binas@A09.binas.org";
+	private static final String VALID_SERVER_PASSWORD = "yRTg3mgJK";
+	private static final int VALID_DURATION = 30;
 	//
 	// Handler interface implementation
 	//
@@ -69,11 +76,6 @@ public class KerberosClientHandler implements SOAPHandler<SOAPMessageContext> {
 			if (outboundElement.booleanValue()) {
 				System.out.println("Writing header to OUTbound SOAP message...");
 
-				final String VALID_CLIENT_NAME = "alice@A09.binas.org";
-				final String VALID_CLIENT_PASSWORD = "tzpxRB7";
-				final String VALID_SERVER_NAME = "binas@A09.binas.org";
-				final String VALID_SERVER_PASSWORD = "yRTg3mgJK";
-				final int VALID_DURATION = 30;
 
 				SecureRandom randomGenerator = new SecureRandom();
 				long nounce = randomGenerator.nextLong();
@@ -92,16 +94,12 @@ public class KerberosClientHandler implements SOAPHandler<SOAPMessageContext> {
 				SessionKey sessionKey = new SessionKey(cipheredSessionKey, clientKey);
 				
 				Ticket ticket = new Ticket(cipheredTicket, serverKey);
+				ticket.cipher(serverKey);
 				long timeDiff = ticket.getTime2().getTime() - ticket.getTime1().getTime();
-				
+
 				Auth auth = new Auth(VALID_CLIENT_NAME, new Date());
-//				Auth auth2 = new Auth();
-				Node node_t = ticket.toXMLNode("Ticket");
-				Node node_a = ticket.toXMLNode("Authentication");
-
+				CipheredView cipheredAuthenticator = auth.cipher(sessionKey.getKeyXY());
 				
-				System.out.println("Writing header to OUTbound SOAP message...");
-
 				// get SOAP envelope
 				SOAPMessage msg = smc.getMessage();
 				SOAPPart sp = msg.getSOAPPart();
@@ -111,22 +109,52 @@ public class KerberosClientHandler implements SOAPHandler<SOAPMessageContext> {
 				SOAPHeader sh = se.getHeader();
 				if (sh == null)
 					sh = se.addHeader();
-				sh.appendChild(node_t);
-				sh = se.addHeader();
-				sh.appendChild(node_a);
-				
-				//Name name = se.createName("myHeader", "d", "http://demo");
 
-				//SOAPHeaderElement element = sh.addHeaderElement(name);
-
+				// add header element (name, namespace prefix, namespace)
+				Name name = se.createName("Ticket" , "t" , "http://demo");
+				SOAPHeaderElement element = sh.addHeaderElement(name);
 				// add header element value
-				//element.appendChild(node_t);
-				
+				String str = BytesToString(cipheredTicket.getData());
+				element.addTextNode(str);
+
+				name = se.createName("Authenticator", "a" , "http://demo");
+				element = sh.addHeaderElement(name);
+				// add header element value
+				str = BytesToString(cipheredAuthenticator.getData());
+				element.addTextNode(str);
 
 			} else {
 				System.out.println("Reading header from INbound SOAP message...");
 
+				// get SOAP envelope header
+				SOAPMessage msg = smc.getMessage();
+				SOAPPart sp = msg.getSOAPPart();
+				SOAPEnvelope se = sp.getEnvelope();
+				SOAPHeader sh = se.getHeader();
+
+				// check header
+				if (sh == null) {
+					System.out.println("Header not found.");
+					return true;
+				}
+
+				// get first header element
+				Name name = se.createName("RequestTime" , "rt" , "http://demo");
+				Iterator<?> it = sh.getChildElements(name);
+				// check header element
+				if (!it.hasNext()) {
+					System.out.println("Header element not found1.");
+					return true;
+				}
+				SOAPElement element = (SOAPElement) it.next();
+				String TreqString = element.getValue();
+					
+				RequestTime Treq = new RequestTime();
+				Treq.fromXMLBytes(StringToBytes(TreqString));
 				
+				//Auth auth = new Auth(VALID_CLIENT_NAME, Treq.getTimeRequest());
+
+				//auth.validate();
 
 			}
 		} catch (Exception e) {
@@ -158,4 +186,24 @@ public class KerberosClientHandler implements SOAPHandler<SOAPMessageContext> {
 		return SecurityHelper.generateKeyFromPassword(password);
 	}
 	
+	public static byte[] StringToBytes(String s) {
+	    int len = s.length();
+	    byte[] data = new byte[len / 2];
+	    for (int i = 0; i < len; i += 2) {
+	        data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
+	                             + Character.digit(s.charAt(i+1), 16));
+	    }
+	    return data;
+	}
+	
+	private final static char[] hexArray = "0123456789ABCDEF".toCharArray();
+	public static String BytesToString(byte[] bytes) {
+	    char[] hexChars = new char[bytes.length * 2];
+	    for ( int j = 0; j < bytes.length; j++ ) {
+	        int v = bytes[j] & 0xFF;
+	        hexChars[j * 2] = hexArray[v >>> 4];
+	        hexChars[j * 2 + 1] = hexArray[v & 0x0F];
+	    }
+	    return new String(hexChars);
+	}
 }
