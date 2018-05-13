@@ -74,7 +74,7 @@ public class MACHandler implements SOAPHandler<SOAPMessageContext> {
 	 */
 	@Override
 	public boolean handleMessage(SOAPMessageContext smc) {
-		System.out.println("KerberosServerHeaderHandler: Handling message.");
+		System.out.println("MAChandler: Handling message.");
 
 		//Boolean outboundElement = (Boolean) smc.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
 		try {
