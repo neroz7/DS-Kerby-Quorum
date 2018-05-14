@@ -36,6 +36,10 @@
             <handler-class>example.ws.handler.KerberosClientHandler</handler-class>
         </handler>
 
+        <handler>
+            <handler-class>example.ws.handler.MACHandler</handler-class>
+        </handler>
+
 
 
         <!-- 

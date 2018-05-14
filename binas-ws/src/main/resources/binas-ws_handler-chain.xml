@@ -31,6 +31,9 @@
             <handler-class>example.ws.handler.HeaderHandler</handler-class>
         </handler-->
         <handler>
+            <handler-class>example.ws.handler.MACHandler</handler-class>
+        </handler>
+        <handler>
             <handler-class>example.ws.handler.KerberosServerHandler</handler-class>
         </handler>
 		<!-- 
@@ -45,7 +48,6 @@
         <handler>
             <handler-class>example.ws.handler.PrettyLogHandler</handler-class>
         </handler>
-
         <!-- 
             Print the SOAP message with added indentation for easier reading.
         -->

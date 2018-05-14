@@ -47,7 +47,9 @@ public class KerberosServerHandler implements SOAPHandler<SOAPMessageContext> {
 
 	// PARA IMPLEMENTAR
 
-	
+	public static final String CONTEXT_PROPERTY = "my.Treq";
+	public static final String CONTEXT_KCS = "my.Kcs";
+
 	
 	
 	/**
@@ -71,16 +73,15 @@ public class KerberosServerHandler implements SOAPHandler<SOAPMessageContext> {
 
 		try {
 			if (outboundElement.booleanValue()) {
-				System.out.println("Writing header to OUTbound SOAP message...");
+				System.out.println("Writing Kerberos Server header to OUTbound SOAP message...");
 
 				// get SOAP envelope
 				SOAPMessage msg = smc.getMessage();
 				SOAPPart sp = msg.getSOAPPart();
 				SOAPEnvelope se = sp.getEnvelope();
 
-				RequestTime Treq = new RequestTime(new Date());
-				//Date date = new Date();
-
+				CipheredView treq = (CipheredView) smc.get(CONTEXT_PROPERTY);
+				//smc.remove(CONTEXT_PROPERTY);
 				// add header
 				SOAPHeader sh = se.getHeader();
 				if (sh == null)
@@ -90,12 +91,12 @@ public class KerberosServerHandler implements SOAPHandler<SOAPMessageContext> {
 				Name name = se.createName("RequestTime" , "rt" , "http://demo");
 				SOAPHeaderElement element = sh.addHeaderElement(name);
 				// add header element value
-				String str = BytesToString(Treq.toXMLBytes("rt"));
+				String str = BytesToString(treq.getData());
 				element.addTextNode(str);
 
 			} else {
 				
-				System.out.println("Reading header from INbound SOAP message...");
+				System.out.println("Reading Kerberos Server header from INbound SOAP message...");
 
 				// get SOAP envelope header
 				SOAPMessage msg = smc.getMessage();
@@ -144,7 +145,9 @@ public class KerberosServerHandler implements SOAPHandler<SOAPMessageContext> {
 				cipheredAuthenticator.setData(StringToBytes(authenticatorString));
 				Auth auth = new Auth(cipheredAuthenticator, ticket.getKeyXY());
 				auth.validate();
-								
+				RequestTime Treq = new RequestTime(auth.getTimeRequest());
+				CipheredView treq = Treq.cipher(ticket.getKeyXY());
+						
 				/*
 				// print received header
 				//System.out.println("Header value is " + ticketString);
@@ -152,13 +155,17 @@ public class KerberosServerHandler implements SOAPHandler<SOAPMessageContext> {
 				// put header in a property context
 				smc.put(CONTEXT_PROPERTY, ticketString);
 
-				smc.put(CONTEXT_PROPERTY, authenticatorString);
-				smc.put(CONTEXT_PROPERTY, Treq);
+				smc.put(CONTEXT_PROPERTY, authenticatorString);*/
 				
+				smc.put(CONTEXT_PROPERTY, treq);
+				smc.put(CONTEXT_KCS, ticket.getKeyXY());
+
 				// set property scope to application client/server class can
 				// access it
 				smc.setScope(CONTEXT_PROPERTY, Scope.APPLICATION);
-				*/
+				smc.setScope(CONTEXT_KCS, Scope.APPLICATION);
+
+				
 				
 				//SOAPElement element_a = (SOAPElement) it.next();
 				//Auth a = new Auth(element_a.getElementsByTagName("Authentication").item(0));

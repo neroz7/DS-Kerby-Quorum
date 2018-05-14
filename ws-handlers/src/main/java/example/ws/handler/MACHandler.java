@@ -1,63 +1,49 @@
 package example.ws.handler;
 
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
 import java.security.Key;
-import java.util.Arrays;
-import java.util.Date;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.Iterator;
 import java.util.Set;
 
-import javax.crypto.KeyGenerator;
-import javax.crypto.Mac;
-import javax.crypto.SecretKey;
 import javax.xml.namespace.QName;
 import javax.xml.soap.Name;
 import javax.xml.soap.SOAPElement;
 import javax.xml.soap.SOAPEnvelope;
 import javax.xml.soap.SOAPHeader;
-import javax.xml.soap.SOAPHeaderElement;
 import javax.xml.soap.SOAPMessage;
 import javax.xml.soap.SOAPPart;
 import javax.xml.ws.handler.MessageContext;
+import javax.xml.ws.handler.MessageContext.Scope;
 import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 
-import pt.ulisboa.tecnico.sdis.kerby.Auth;
-import pt.ulisboa.tecnico.sdis.kerby.CipheredView;
-import pt.ulisboa.tecnico.sdis.kerby.RequestTime;
-import pt.ulisboa.tecnico.sdis.kerby.Ticket;
+import pt.ulisboa.tecnico.sdis.kerby.SecurityHelper;
 
 /**
  * This SOAPHandler outputs the contents of inbound and outbound messages.
  */
 public class MACHandler implements SOAPHandler<SOAPMessageContext> {
 
+	
+
+	private static final String VALID_CLIENT_NAME = "alice@A09.binas.org";
+	private static final String VALID_CLIENT_PASSWORD = "tzpxRB7";
+	private static final String VALID_SERVER_NAME = "binas@A09.binas.org";
+	private static final String VALID_SERVER_PASSWORD = "yRTg3mgJK";
+	private static final int VALID_DURATION = 30;
 	//
 	// Handler interface implementation
 	//
 
 	
 	// PARA IMPLEMENTAR
+	public static final String CONTEXT_KCS = "my.Kcs";
+	public static final String CONTEXT_KCS2 = "my.Kcs2";
 
-	/** Symmetric cryptography algorithm. */
-	private static final String SYM_ALGO = "AES";
-	/** Symmetric algorithm key size. */
-	private static final int SYM_KEY_SIZE = 128;
-	/** Length of initialization vector. */
-	private static final int SYM_IV_LEN = 16;
-	/** Number generator algorithm. */
-	private static final String NUMBER_GEN_ALGO = "SHA1PRNG";
-
-	/** Message authentication code algorithm. */
-	private static final String MAC_ALGO = "HmacSHA256";
-
-	/**
-	 * Symmetric cipher: combination of algorithm, block processing, and
-	 * padding.
-	 */
-	private static final String SYM_CIPHER = "AES/CBC/PKCS5Padding";
-	/** Digest algorithm. */
-	private static final String DIGEST_ALGO = "SHA-256";
-
+	
 	
 	/**
 	 * Gets the header blocks that can be processed by this Handler instance. If
@@ -74,65 +60,116 @@ public class MACHandler implements SOAPHandler<SOAPMessageContext> {
 	 */
 	@Override
 	public boolean handleMessage(SOAPMessageContext smc) {
-		System.out.println("MAChandler: Handling message.");
+		System.out.println("MACHandler: Handling message.");
 
-		//Boolean outboundElement = (Boolean) smc.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
+		Boolean outboundElement = (Boolean) smc.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
+
 		try {
-			System.out.println("Writing header to OUTbound SOAP message...");
+			if (outboundElement.booleanValue()) {
+				System.out.println("Writing MAC to header to OUTbound SOAP message...");
 
-			// get SOAP envelope
-			SOAPMessage msg = smc.getMessage();
+				// get SOAP envelope
+				SOAPMessage msg = smc.getMessage();
+				SOAPPart sp = msg.getSOAPPart();
+				SOAPEnvelope se = sp.getEnvelope();
 				
-			SecretKey key = generateMACKey(SYM_KEY_SIZE);
-				
-			byte[] msgBytes = msg.toString().getBytes(); 
-				
-			byte[] cipherDigest = makeMAC(msgBytes, key);
+				SOAPHeader sh = se.getHeader();
 
-			// verify the MAC
-			boolean result = verifyMAC(cipherDigest, msgBytes, key);
+				// check header
+				if (sh == null) {
+					System.out.println("Header not found.");
+					return true;
+				}
 				
-			return result;
+
+				// add header element (name, namespace prefix, namespace)
+				Name name = se.createName("MAC", "mac", "http://demo");
+				
+				SOAPElement element = sh.addHeaderElement(name);
+				Key sessionKey = (Key) smc.get(CONTEXT_KCS);
+				//smc.remove(CONTEXT_KCS);
+				
+				//OutputStream out = new ByteArrayOutputStream();
+				//msg.writeTo(out);
+				String M = msg.getSOAPBody().getTextContent();
+
+				
+				final Key MAC = getKey(M + new String(sessionKey.getEncoded()));
+				System.out.println("SEND Session Key : " + new String(sessionKey.getEncoded()));
+				System.out.println("SEND SOAP BODY : " + M);
+
+				// add header element value
+				String MACString = BytesToStringHex(MAC.getEncoded());
+				System.out.println("SEND MAC : " + MACString);
+
+				element.addTextNode(MACString);
+				
+			} else {
+				System.out.println("Reading MAC in header from INbound SOAP message...");
+
+				// get SOAP envelope header
+				SOAPMessage msg = smc.getMessage();
+				SOAPPart sp = msg.getSOAPPart();
+				SOAPEnvelope se = sp.getEnvelope();
+				SOAPHeader sh = se.getHeader();
+
+				// check header
+				if (sh == null) {
+					System.out.println("Header not found.");
+					return true;
+				}
+				
+				// get first header element
+				Name name = se.createName("MAC", "mac", "http://demo");
+				Iterator<?> it = sh.getChildElements(name);
+				// check header element
+				if (!it.hasNext()) {
+					System.out.println("Header element not found.");
+					return true;
+				}
+				SOAPElement element = (SOAPElement) it.next();
+				
+				// get header element value
+				String MACString = element.getValue();
+				Key sessionKey = (Key) smc.get(CONTEXT_KCS);
+				
+				if(sessionKey == null) {
+					System.out.println("SESSION KEY NULL!");
+				}else {	
+					//OutputStream out = new ByteArrayOutputStream();
+					//msg.writeTo(out);
+					String M = msg.getSOAPBody().getTextContent();
+					final Key MAC = getKey(M + new String(sessionKey.getEncoded()));
+					System.out.println("RECEIVE Session Key : " + new String(sessionKey.getEncoded()));;
+					System.out.println("RECEIVE SOAP BODY : " + M);
+					System.out.println("RECEIVE MAC : " + MACString);
+	
+					String MACString2 = BytesToStringHex(MAC.getEncoded());
+					System.out.println("GENERATED MAC : " + MACString2);
+	
+					if(!MACString.equals(MACString2)) {
+						System.out.println("INTEGRIDADE VIOLADA! MAC");
+						//FAULT
+					}
+				}
+				// print received header
+				//System.out.println("Header value is " + value);
+
+				/*// put header in a property context
+				smc.put(CONTEXT_PROPERTY, value);
+				// set property scope to application client/server class can
+				// access it
+				smc.setScope(CONTEXT_PROPERTY, Scope.APPLICATION);
+*/
+			}
 		} catch (Exception e) {
 			System.out.print("Caught exception in handleMessage: ");
 			System.out.println(e);
 			System.out.println("Continue normal processing...");
 		}
-		return true;
-	}
 
-	/** Generates a SecretKey for using in message authentication code. */
-	private static SecretKey generateMACKey(int keySize) throws Exception {
-		// generate an AES secret key
-		KeyGenerator keyGen = KeyGenerator.getInstance(SYM_ALGO);
-		keyGen.init(keySize);
-		SecretKey key = keyGen.generateKey();
+		return true;	}
 
-		return key;
-	}
-
-	/** Makes a message authentication code. */
-	private static byte[] makeMAC(byte[] bytes, SecretKey key) throws Exception {
-
-		Mac cipher = Mac.getInstance(MAC_ALGO);
-		cipher.init(key);
-		byte[] cipherDigest = cipher.doFinal(bytes);
-
-		return cipherDigest;
-	}
-
-	/**
-	 * Calculates new digest from text and compare it to the to deciphered
-	 * digest.
-	 */
-	private static boolean verifyMAC(byte[] cipherDigest, byte[] bytes, SecretKey key) throws Exception {
-
-		Mac cipher = Mac.getInstance(MAC_ALGO);
-		cipher.init(key);
-		byte[] cipheredBytes = cipher.doFinal(bytes);
-		return Arrays.equals(cipherDigest, cipheredBytes);
-	}
-	
 	/** The handleFault method is invoked for fault message processing. */
 	@Override
 	public boolean handleFault(SOAPMessageContext smc) {
@@ -147,5 +184,29 @@ public class MACHandler implements SOAPHandler<SOAPMessageContext> {
 	public void close(MessageContext messageContext) {
 		// nothing to clean up
 	}
-
+	// Test Helpers -------------------------------------------------------------
+	private static Key getKey(String password) throws NoSuchAlgorithmException, InvalidKeySpecException {
+		return SecurityHelper.generateKeyFromPassword(password);
+	}
+	
+	public static byte[] StringHexToBytes(String s) {
+	    int len = s.length();
+	    byte[] data = new byte[len / 2];
+	    for (int i = 0; i < len; i += 2) {
+	        data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
+	                             + Character.digit(s.charAt(i+1), 16));
+	    }
+	    return data;
+	}
+	
+	private final static char[] hexArray = "0123456789ABCDEF".toCharArray();
+	public static String BytesToStringHex(byte[] bytes) {
+	    char[] hexChars = new char[bytes.length * 2];
+	    for ( int j = 0; j < bytes.length; j++ ) {
+	        int v = bytes[j] & 0xFF;
+	        hexChars[j * 2] = hexArray[v >>> 4];
+	        hexChars[j * 2 + 1] = hexArray[v & 0x0F];
+	    }
+	    return new String(hexChars);
+	}
 }

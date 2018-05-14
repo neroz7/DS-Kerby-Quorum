@@ -49,6 +49,7 @@ public class KerberosClientHandler implements SOAPHandler<SOAPMessageContext> {
 
 	
 	// PARA IMPLEMENTAR
+	public static final String CONTEXT_KCS = "my.Kcs";
 
 	
 	
@@ -74,14 +75,14 @@ public class KerberosClientHandler implements SOAPHandler<SOAPMessageContext> {
 
 		try {
 			if (outboundElement.booleanValue()) {
-				System.out.println("Writing header to OUTbound SOAP message...");
+				System.out.println("Writing Kerberos Client header to OUTbound SOAP message...");
 
 
 				SecureRandom randomGenerator = new SecureRandom();
 				long nounce = randomGenerator.nextLong();
 
 				final Key clientKey = getKey(VALID_CLIENT_PASSWORD); // get passwords keys
-				final Key serverKey = getKey(VALID_SERVER_PASSWORD);
+				//final Key serverKey = getKey(VALID_SERVER_PASSWORD);
 				
 				String wsURL = "http://sec.sd.rnl.tecnico.ulisboa.pt:8888/kerby";
 				KerbyClient client = new KerbyClient(wsURL);
@@ -93,9 +94,9 @@ public class KerberosClientHandler implements SOAPHandler<SOAPMessageContext> {
 				
 				SessionKey sessionKey = new SessionKey(cipheredSessionKey, clientKey);
 				
-				Ticket ticket = new Ticket(cipheredTicket, serverKey);
-				ticket.cipher(serverKey);
-				long timeDiff = ticket.getTime2().getTime() - ticket.getTime1().getTime();
+				//Ticket ticket = new Ticket(cipheredTicket, serverKey);
+				//ticket.cipher(serverKey);
+				//long timeDiff = ticket.getTime2().getTime() - ticket.getTime1().getTime();
 
 				Auth auth = new Auth(VALID_CLIENT_NAME, new Date());
 				CipheredView cipheredAuthenticator = auth.cipher(sessionKey.getKeyXY());
@@ -122,9 +123,17 @@ public class KerberosClientHandler implements SOAPHandler<SOAPMessageContext> {
 				// add header element value
 				str = BytesToString(cipheredAuthenticator.getData());
 				element.addTextNode(str);
+				System.out.println("Sending with Request Time : "+ auth.getTimeRequest().toString());
+
+				
+				smc.put(CONTEXT_KCS, sessionKey.getKeyXY());
+				
+				// set property scope to application client/server class can
+				// access it
+				smc.setScope(CONTEXT_KCS, Scope.APPLICATION);
 
 			} else {
-				System.out.println("Reading header from INbound SOAP message...");
+				System.out.println("Reading Kerberos Client header from INbound SOAP message...");
 
 				// get SOAP envelope header
 				SOAPMessage msg = smc.getMessage();
@@ -148,10 +157,14 @@ public class KerberosClientHandler implements SOAPHandler<SOAPMessageContext> {
 				}
 				SOAPElement element = (SOAPElement) it.next();
 				String TreqString = element.getValue();
-					
-				RequestTime Treq = new RequestTime();
-				Treq.fromXMLBytes(StringToBytes(TreqString));
 				
+				CipheredView treq = new CipheredView();
+				treq.setData(StringToBytes(TreqString));
+				Key sessionKey = (Key) smc.get(CONTEXT_KCS);
+				//smc.put(CONTEXT_KCS,sessionKey);
+				//smc.remove(CONTEXT_KCS);
+				RequestTime Treq = new RequestTime(treq, sessionKey);
+				System.out.println("Received Request Time : "+ Treq.getTimeRequest().toString());
 				//Auth auth = new Auth(VALID_CLIENT_NAME, Treq.getTimeRequest());
 
 				//auth.validate();
